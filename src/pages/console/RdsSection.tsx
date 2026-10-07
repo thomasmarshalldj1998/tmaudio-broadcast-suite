@@ -217,7 +217,7 @@ export function RdsSection() {
 
         {/* --- group table --------------------------------------------- */}
         <div className="flex flex-col gap-4">
-          <div className="overflow-hidden rounded-lg border border-border/60">
+          <div className="overflow-x-auto rounded-lg border border-border/60">
             <div className="grid grid-cols-[64px_1fr_84px_84px_66px] gap-2 border-b border-border/60 bg-[#0E1014] px-3 py-2 text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
               <span>Group</span>
               <span>Blocks A B C D</span>

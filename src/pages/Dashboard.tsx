@@ -256,10 +256,8 @@ export default function Dashboard() {
 
         {/* ---------------- rack units ---------------- */}
         <main className="mx-auto flex max-w-[1500px] flex-col gap-5 px-4 py-5 sm:px-6 sm:py-6">
-          <div className="grid gap-5 2xl:grid-cols-2">
-            <InputSection />
-            <SensusSection />
-          </div>
+          <InputSection />
+          <SensusSection />
           <ImagingSection />
           <OutputChainsSection />
           <RdsSection />
