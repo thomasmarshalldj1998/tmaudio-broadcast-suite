@@ -1,12 +1,92 @@
+import { PATH_COLORS, fixed } from "@/lib/tm/dsp";
+import { getPreset, type PresetKey, type ProcessorConfig } from "@/lib/tm/presets";
+import { LevelMeter, loudness, truePeak, useTick } from "@/components/tm/analyzers";
+import { Led, Legend, Readout, Segmented } from "@/components/tm/ui";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, LogOut } from "lucide-react";
-import { useNavigate } from "react-router";
+import { cn } from "@/lib/utils";
+import { LogOut, Pause, Play, RotateCcw } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { ConsoleContext, type ConsoleCtx } from "./console/context";
+import {
+  ImagingSection,
+  InputSection,
+  SensusSection,
+} from "./console/ProcessingSections";
+import { OutputChainsSection } from "./console/OutputChains";
+import { ReferenceSection } from "./console/Reference";
+import { RdsSection } from "./console/RdsSection";
+import logo from "@/assets/logo.svg";
+
+const PRESET_TABS: { value: PresetKey; label: string }[] = [
+  { value: "fm", label: "FM Optimised" },
+  { value: "dab", label: "DAB+ Standard" },
+  { value: "web", label: "Web 128 kbps" },
+  { value: "hd", label: "HD Hybrid" },
+];
+
+function chainTargets(cfg: ProcessorConfig, key: PresetKey) {
+  if (key === "dab") return { target: cfg.dab.loudness, ceiling: cfg.dab.truePeak };
+  if (key === "web") return { target: cfg.web.loudness, ceiling: cfg.web.truePeak };
+  if (key === "hd") return { target: -16, ceiling: -2 };
+  return { target: -14, ceiling: -1 };
+}
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const [cfg, setCfg] = useState<ProcessorConfig>(
+    () => getPreset("fm").config,
+  );
+  const [presetKey, setPresetKey] = useState<PresetKey>("fm");
+  const [running, setRunning] = useState(true);
+  const [dirty, setDirty] = useState(false);
+
+  useTick(90);
+  const t = performance.now() / 1000;
+  const { target, ceiling } = chainTargets(cfg, presetKey);
+  const preset = getPreset(presetKey);
+
+  const cpu = 6.4 + (running ? 3.1 : 0.4) + (Math.sin(t * 0.8) + 1) * 1.3;
+
+  const ctx = useMemo<ConsoleCtx>(
+    () => ({
+      cfg,
+      running,
+      presetKey,
+      cpu,
+      setRunning,
+      set: (key, patch) => {
+        setCfg((prev) => {
+          const section = prev[key] as Record<string, unknown>;
+          const merged = { ...section, ...(patch as Record<string, unknown>) };
+          return { ...prev, [key]: merged } as unknown as ProcessorConfig;
+        });
+        setDirty(true);
+      },
+      setBand: (index, patch) => {
+        setCfg((prev) => ({
+          ...prev,
+          sensus: {
+            ...prev.sensus,
+            bands: prev.sensus.bands.map((b, i) =>
+              i === index ? { ...b, ...patch } : b,
+            ),
+          },
+        }));
+        setDirty(true);
+      },
+      loadPreset: (key) => {
+        setCfg(getPreset(key).config);
+        setPresetKey(key);
+        setDirty(false);
+      },
+      markDirty: () => setDirty(true),
+    }),
+    [cfg, running, presetKey, cpu],
+  );
 
   const handleSignOut = async () => {
     await signOut();
@@ -14,42 +94,187 @@ export default function Dashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-background px-6 py-10 text-foreground">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">
-              Authenticated workspace
-            </p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight">
-              Welcome{user?.name ? `, ${user.name}` : ""}
-            </h1>
+    <ConsoleContext.Provider value={ctx}>
+      <div className="min-h-screen bg-[#0B0C0E] text-foreground">
+        {/* ---------------- rack header ---------------- */}
+        <header className="sticky top-0 z-40 border-b border-border/70 bg-[#0B0C0E]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0B0C0E]/85">
+          <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-6">
+            <Link to="/" className="group flex items-center gap-3">
+              <img
+                src={logo}
+                alt="TMAUDIO"
+                width={34}
+                height={34}
+                className="rounded-md ring-1 ring-white/10 transition-transform group-hover:scale-[1.04]"
+              />
+              <span className="flex flex-col">
+                <span className="text-[13px] leading-none font-semibold tracking-[0.14em] text-foreground">
+                  TMAUDIO
+                </span>
+                <span className="mt-1 hidden text-[9px] leading-none tracking-[0.18em] text-muted-foreground uppercase sm:block">
+                  Broadcast Processing Suite
+                </span>
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setRunning(!running)}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg border px-3 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase transition-all",
+                  running
+                    ? "border-[#F5A524]/50 bg-[#F5A524]/12 text-[#F5A524] hover:bg-[#F5A524]/20"
+                    : "border-border/70 bg-[#14171C] text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {running ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+                {running ? "Running" : "Paused"}
+              </button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="gap-1.5 text-muted-foreground"
+                onClick={() => setCfg(getPreset(presetKey).config)}
+                title="Reset this preset to factory values"
+              >
+                <RotateCcw className="size-3.5" />
+                Reset
+              </Button>
+            </div>
+
+            <div className="hidden min-w-0 flex-1 xl:block">
+              <Segmented<PresetKey>
+                value={presetKey}
+                onChange={(v) => {
+                  setCfg(getPreset(v).config);
+                  setPresetKey(v);
+                  setDirty(false);
+                }}
+                options={PRESET_TABS}
+                size="sm"
+              />
+            </div>
+
+            <div className="ml-auto flex flex-wrap items-center gap-x-5 gap-y-2">
+              <div className="flex flex-col gap-1.5">
+                <LevelMeter
+                  label="Loudness"
+                  value={loudness(t, target)}
+                  min={-40}
+                  max={-4}
+                  unit="LUFS"
+                  width="w-40"
+                  accent={PATH_COLORS.fm}
+                />
+                <LevelMeter
+                  label="True peak"
+                  value={truePeak(t, ceiling)}
+                  min={-12}
+                  max={2}
+                  ceiling={ceiling}
+                  unit="dBTP"
+                  width="w-40"
+                  accent={PATH_COLORS.fm}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 border-l border-border/60 pl-5">
+                <div className="flex items-center gap-3">
+                  <Legend>Engine</Legend>
+                  <Readout value="96k / 32f" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Legend>CPU</Legend>
+                  <Readout value={fixed(cpu, 1)} unit="%" tone={cpu > 18 ? "red" : "green"} />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Legend>Blocks</Legend>
+                  <Readout value={cfg.sensus.blockSize === 32 ? "32" : "64"} unit="smp" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 border-l border-border/60 pl-5">
+                <div className="flex items-center gap-3">
+                  <Led on={running} label="signal" color="#4ADE80" />
+                  <Led on={cfg.rds.enabled} label="rds" color="#35C8D8" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Led on={running} label="mpx" color="#F5A524" />
+                  <Led on={dirty} label="edited" color="#FF4D4D" />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 border-l border-border/60 pl-5">
+                <span className="hidden font-mono text-[10px] text-muted-foreground md:block">
+                  {user?.name ?? user?.email ?? "operator"}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="size-8 text-muted-foreground"
+                  onClick={handleSignOut}
+                  title="Sign out"
+                >
+                  <LogOut className="size-4" />
+                </Button>
+              </div>
+            </div>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="cursor-pointer gap-2 self-start"
-            onClick={handleSignOut}
-          >
-            <LogOut className="size-4" />
-            Sign out
-          </Button>
+
+          <div className="border-t border-border/50 bg-[#0E1014]">
+            <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-x-6 gap-y-1.5 px-4 py-2 sm:px-6">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+                <span className="font-mono text-[10px] tracking-wider text-[#F5A524]">
+                  {preset.name.toUpperCase()}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {preset.target}
+                </span>
+                <span className="hidden text-[10px] text-muted-foreground/80 md:inline">
+                  {preset.note}
+                </span>
+              </div>
+              <div className="flex items-center gap-x-5 gap-y-1 font-mono text-[10px] tabular-nums text-muted-foreground">
+                <span>MPX 192 kHz</span>
+                <span>
+                  pre-emphasis <span className="text-foreground/80">{cfg.fm.emphasis} µs</span>
+                </span>
+                <span>
+                  pilot <span className="text-foreground/80">{fixed(cfg.fm.pilot, 1)} %</span>
+                </span>
+                <span className="hidden sm:inline">
+                  RDS <span className="text-foreground/80">0x{cfg.rds.pi.toString(16).toUpperCase().padStart(4, "0")}</span>
+                </span>
+                <span>
+                  mode <span className="text-foreground/80">{cfg.sensus.mode}</span>
+                </span>
+              </div>
+            </div>
+          </div>
         </header>
 
-        <Card className="border-border/70 shadow-none">
-          <CardHeader>
-            <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <LayoutDashboard className="size-5" />
-            </div>
-            <CardTitle>Your dashboard is ready</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm leading-6 text-muted-foreground">
-            Replace this starter content with the product&apos;s authenticated
-            experience. The route is protected and sign-in returns here by
-            default.
-          </CardContent>
-        </Card>
+        {/* ---------------- rack units ---------------- */}
+        <main className="mx-auto flex max-w-[1500px] flex-col gap-5 px-4 py-5 sm:px-6 sm:py-6">
+          <div className="grid gap-5 2xl:grid-cols-2">
+            <InputSection />
+            <SensusSection />
+          </div>
+          <ImagingSection />
+          <OutputChainsSection />
+          <RdsSection />
+          <ReferenceSection />
+
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-5 pb-2 text-[10px] text-muted-foreground">
+            <span>
+              TMAUDIO Digital Broadcast Processing Suite · C++20 · JUCE · AVX2 / NEON
+            </span>
+            <span className="font-mono tabular-nums">
+              FM · DAB+ · WEB · HD — four independent chains, one clock
+            </span>
+          </footer>
+        </main>
       </div>
-    </main>
+    </ConsoleContext.Provider>
   );
 }
