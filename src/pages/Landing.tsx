@@ -201,7 +201,7 @@ export default function Landing() {
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-[#F5A524]/30 bg-[#F5A524]/8 px-3 py-1.5 text-[10px] tracking-[0.2em] text-[#F5A524] uppercase">
               <Waves className="size-3" />
-              Open · cross-platform · broadcast compliant
+              Standalone Edition v1.0 · open · cross-platform · self-contained
             </span>
 
             <h1 className="mt-6 text-4xl leading-[1.04] font-semibold tracking-[-0.03em] text-foreground sm:text-6xl">
@@ -657,7 +657,7 @@ uint16_t checkword(uint16_t block, uint16_t offset) {
         <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-4 px-4 py-8 text-[11px] text-muted-foreground sm:px-6">
           <span className="flex items-center gap-2">
             <img src={logo} alt="" width={18} height={18} className="rounded" />
-            TMAUDIO Digital Broadcast Processing Suite
+            TMAUDIO Digital Broadcast Processing Suite — Standalone Edition v1.0
           </span>
           <span className="font-mono tabular-nums">
             C++20 · JUCE · AVX2 / NEON · Windows · Linux · macOS

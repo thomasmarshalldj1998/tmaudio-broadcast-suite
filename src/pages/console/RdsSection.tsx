@@ -16,8 +16,9 @@ import {
   Segmented,
 } from "@/components/tm/ui";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useConsole } from "./context";
 
 const PTY_NAMES = [
@@ -50,6 +51,27 @@ export function RdsSection() {
   const { cfg, set, running } = useConsole();
   const rds = cfg.rds;
   const tick = useTick(1000);
+
+  const [queue, setQueue] = useState<string[]>([
+    rds.rt,
+    "TMAUDIO Standalone Edition v1.0",
+    "Open source · runs from any folder",
+  ]);
+  const [draftMsg, setDraftMsg] = useState("");
+  const queueIdx = queue.length ? Math.floor(tick / 8) % queue.length : 0;
+
+  useEffect(() => {
+    setQueue((q) => (q[0] === rds.rt ? q : [rds.rt, ...q.slice(1)]));
+  }, [rds.rt]);
+
+  // Real-time error estimate: a healthy 2–6 % injection keeps block errors
+  // deep in the 1e-6 region; out-of-spec injection degrades sharply.
+  const inSpec = rds.injection >= 2 && rds.injection <= 6;
+  const errorRate = inSpec
+    ? (1.2 + Math.abs(rds.injection - 4) * 0.9 + (running ? 0.3 : 4))
+        .toExponential(1)
+    : (4.1e-3).toExponential(1);
+  const errorTone: "green" | "red" = inSpec ? "green" : "red";
 
   const model: RdsConfig = {
     ...rds,
@@ -181,7 +203,7 @@ export function RdsSection() {
             <Knob
               label="Injection"
               value={rds.injection}
-              min={0}
+              min={2}
               max={6}
               step={0.1}
               unit="% dev"
@@ -206,13 +228,74 @@ export function RdsSection() {
           <Fader
             label="Modulation onto 57 kHz"
             value={rds.injection}
-            min={0}
+            min={2}
             max={6}
             step={0.1}
             unit="% of 75 kHz"
             accent={PATH_COLORS.dab}
             onChange={(v) => set("rds", { injection: v })}
           />
+
+          {/* --- dynamic RadioText push queue -------------------------- */}
+          <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-[#0E1014] p-3">
+            <div className="flex items-center justify-between">
+              <Legend>RadioText push queue</Legend>
+              <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+                {queue.length} msg · auto-scroll 8 s
+              </span>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {queue.map((msg, i) => {
+                const onAir = queue.length > 0 && i === queueIdx;
+                return (
+                  <button
+                    key={`${i}-${msg.slice(0, 12)}`}
+                    type="button"
+                    onClick={() => set("rds", { rt: msg })}
+                    className={`flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left transition-colors ${
+                      onAir
+                        ? "border-[#35C8D8]/50 bg-[#35C8D8]/10"
+                        : "border-border/50 hover:border-border"
+                    }`}
+                  >
+                    <span
+                      className={`size-1.5 shrink-0 rounded-full ${
+                        onAir ? "bg-[#35C8D8]" : "bg-[#2A2E36]"
+                      }`}
+                    />
+                    <span className="truncate font-mono text-[10px] text-foreground/80">
+                      {msg}
+                    </span>
+                    <span className="ml-auto shrink-0 text-[8px] tracking-[0.14em] text-muted-foreground uppercase">
+                      {onAir ? "on air" : "queue"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <form
+              className="flex gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const next = draftMsg.trim();
+                if (!next) return;
+                setQueue((q) => [...q.slice(-4), next.slice(0, 64)]);
+                setDraftMsg("");
+              }}
+            >
+              <Input
+                value={draftMsg}
+                maxLength={64}
+                placeholder="Queue a RadioText message…"
+                aria-label="Queue RadioText message"
+                onChange={(e) => setDraftMsg(e.target.value)}
+                className="h-8 flex-1 font-mono text-[11px]"
+              />
+              <Button size="sm" type="submit" variant="outline" className="h-8">
+                Queue
+              </Button>
+            </form>
+          </div>
         </div>
 
         {/* --- group table --------------------------------------------- */}
@@ -305,6 +388,16 @@ export function RdsSection() {
               <div className="flex items-baseline justify-between">
                 <span className="text-[11px] text-muted-foreground">Phase error</span>
                 <Readout value={fixed(0.02, 2)} unit="°" tone="green" />
+              </div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-[11px] text-muted-foreground">
+                  Error rate
+                </span>
+                <Readout
+                  value={errorRate}
+                  unit="/block"
+                  tone={errorTone}
+                />
               </div>
               <div className="mt-1 border-t border-border/50 pt-3 text-[10px] leading-relaxed text-muted-foreground">
                 Group rotation: 0A ×4 → 2A ×4 → 4A → 1A, repeating at 1187.5

@@ -148,8 +148,9 @@ export function OutputChainsSection() {
             />
             <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] text-muted-foreground">
               <span>
-                L+R 0–15 kHz · 19 kHz pilot {fixed(fm.pilot, 1)} % · 38 kHz
-                DSB-SC {fixed(fm.subcarrier, 0)} % · 57 kHz RDS BPSK
+                L+R 0–15 kHz @ 90 % (±0.05 dB) · 19 kHz pilot{" "}
+                {fixed(fm.pilot, 1)} % · 38 kHz DSB-SC {fixed(fm.subcarrier, 0)}
+                % · 57 kHz RDS BPSK {fixed(fm.rdsInjection, 1)} %
               </span>
               <span className="font-mono tabular-nums text-[#4ADE80]">
                 {fm.maskEnforce ? "MASK ENFORCED" : "MASK BYPASSED"}
@@ -263,8 +264,12 @@ export function OutputChainsSection() {
                 <Led on={running} label="stream" color="#F5A524" />
               </div>
             </div>
-            <div className="flex items-center justify-between border-t border-border/50 pt-3 font-mono text-[10px] tabular-nums text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-border/50 pt-3 font-mono text-[10px] tabular-nums text-muted-foreground">
               <span>MPX output {fm.outputRate.toLocaleString("en-US")} Hz PCM</span>
+              <span>
+                µMPX RTP/UDP {fm.rtpHost}:{fm.rtpPort} · AES3 · analogue L/R +
+                composite
+              </span>
               <span>IMD &lt; −60 dBc @ 100 % mod</span>
               <span>pilot drift &lt; ±1°</span>
             </div>

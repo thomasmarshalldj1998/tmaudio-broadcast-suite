@@ -5,6 +5,8 @@ export type ConsoleCtx = {
   cfg: ProcessorConfig;
   running: boolean;
   presetKey: PresetKey;
+  presetLabel: string;
+  presetNote: string;
   cpu: number;
   setRunning: (v: boolean) => void;
   set: <K extends keyof ProcessorConfig>(
@@ -13,6 +15,12 @@ export type ConsoleCtx = {
   ) => void;
   setBand: (index: number, patch: Partial<BandCfg>) => void;
   loadPreset: (key: PresetKey) => void;
+  loadConfig: (
+    config: ProcessorConfig,
+    label: string,
+    note: string,
+    chain: PresetKey,
+  ) => void;
   markDirty: () => void;
 };
 

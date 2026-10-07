@@ -10,6 +10,7 @@ import { BANDS } from "./dsp";
 
 export type BandCfg = {
   threshold: number; // dBFS
+  ratio: number; // :1
   attack: number; // ms
   hold: number; // ms
   release: number; // ms
@@ -18,8 +19,11 @@ export type BandCfg = {
 };
 
 export type InputCfg = {
-  slowAgcMs: number;
-  fastAgcMs: number;
+  slowAgcMs: number; // slow-loop attack
+  slowReleaseMs: number; // slow-loop release
+  fastAgcMs: number; // fast-loop attack
+  fastHoldMs: number; // fast-loop hold
+  fastReleaseMs: number; // fast-loop release
   slowGain: number;
   fastGain: number;
   declip: number; // %
@@ -107,6 +111,23 @@ export type RdsCfg = {
   injection: number;
 };
 
+/** Optional station features: fallback, network I/O, live bypass, logging. */
+export type ExtrasCfg = {
+  silenceDetect: boolean;
+  silenceTimeoutS: number;
+  fallbackInput: boolean;
+  aes67: boolean;
+  djBypass: boolean;
+  transientEnhancer: number; // dB of look-ahead peak restoration
+  dynamicEq: number; // % programme-adaptive tilt
+  phatBass: number; // % psychoacoustic LF reinforcement < 80 Hz
+  presetCrossfadeMs: number; // mute-free, level-matched preset switch
+  watermark: boolean; // side-chain insert for monitoring / ID
+  webRemote: boolean; // built-in browser metering server
+  complianceLog: boolean; // 24 h loudness + modulation health export
+  patchPoint: string; // monitor tap in the chain
+};
+
 export type ProcessorConfig = {
   input: InputCfg;
   sensus: SensusCfg;
@@ -116,11 +137,13 @@ export type ProcessorConfig = {
   web: WebCfg;
   hd: HdCfg;
   rds: RdsCfg;
+  extras: ExtrasCfg;
 };
 
-const baseBands = (): BandCfg[] =>
+export const baseBands = (): BandCfg[] =>
   BANDS.map((b, i) => ({
     threshold: [-24, -20, -17, -15, -14, -13][i],
+    ratio: [3, 2.5, 3, 3.5, 4, 4.5][i],
     attack: [12, 9, 7, 5, 4, 4][i],
     hold: [60, 50, 40, 30, 25, 25][i],
     release: [180, 160, 140, 120, 100, 90][i],
@@ -131,7 +154,10 @@ const baseBands = (): BandCfg[] =>
 export const BASE_CONFIG: ProcessorConfig = {
   input: {
     slowAgcMs: 240,
+    slowReleaseMs: 900,
     fastAgcMs: 12,
+    fastHoldMs: 40,
+    fastReleaseMs: 110,
     slowGain: 6,
     fastGain: 3,
     declip: 45,
@@ -164,7 +190,7 @@ export const BASE_CONFIG: ProcessorConfig = {
     oversample: 16,
     pilot: 9,
     subcarrier: 90,
-    rdsInjection: 3.5,
+    rdsInjection: 4,
     maskEnforce: true,
     outputRate: 192000,
     rtpPort: 9001,
@@ -209,7 +235,22 @@ export const BASE_CONFIG: ProcessorConfig = {
     ta: false,
     ms: true,
     di: true,
-    injection: 3.5,
+    injection: 4,
+  },
+  extras: {
+    silenceDetect: true,
+    silenceTimeoutS: 15,
+    fallbackInput: true,
+    aes67: false,
+    djBypass: false,
+    transientEnhancer: 2.5,
+    dynamicEq: 45,
+    phatBass: 30,
+    presetCrossfadeMs: 800,
+    watermark: false,
+    webRemote: true,
+    complianceLog: true,
+    patchPoint: "Post-AGC",
   },
 };
 
@@ -265,7 +306,7 @@ export const PRESETS: Preset[] = [
       sensus: withBands({
         bands: baseBands().map((b) => ({ ...b, gain: b.gain + 0.5 })),
       }),
-      fm: { emphasis: 50, pilot: 9, rdsInjection: 3.5, mainClip: 6, maskEnforce: true },
+      fm: { emphasis: 50, pilot: 9, rdsInjection: 4, mainClip: 6, maskEnforce: true },
       rds: { enabled: true, ct: true },
     }),
   },

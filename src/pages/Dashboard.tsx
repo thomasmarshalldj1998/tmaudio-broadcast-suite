@@ -14,9 +14,12 @@ import {
   InputSection,
   SensusSection,
 } from "./console/ProcessingSections";
+import { AdvancedSection } from "./console/AdvancedSection";
+import { FactoryPresetsSection } from "./console/FactoryPresets";
 import { OutputChainsSection } from "./console/OutputChains";
 import { ReferenceSection } from "./console/Reference";
 import { RdsSection } from "./console/RdsSection";
+import { StandaloneSection } from "./console/StandaloneSection";
 import logo from "@/assets/logo.svg";
 
 const PRESET_TABS: { value: PresetKey; label: string }[] = [
@@ -41,6 +44,8 @@ export default function Dashboard() {
     () => getPreset("fm").config,
   );
   const [presetKey, setPresetKey] = useState<PresetKey>("fm");
+  const [presetLabel, setPresetLabel] = useState<string>(getPreset("fm").name);
+  const [presetNote, setPresetNote] = useState<string>(getPreset("fm").note);
   const [running, setRunning] = useState(true);
   const [dirty, setDirty] = useState(false);
 
@@ -56,6 +61,8 @@ export default function Dashboard() {
       cfg,
       running,
       presetKey,
+      presetLabel,
+      presetNote,
       cpu,
       setRunning,
       set: (key, patch) => {
@@ -79,13 +86,23 @@ export default function Dashboard() {
         setDirty(true);
       },
       loadPreset: (key) => {
-        setCfg(getPreset(key).config);
+        const preset = getPreset(key);
+        setCfg(preset.config);
         setPresetKey(key);
+        setPresetLabel(preset.name);
+        setPresetNote(preset.note);
+        setDirty(false);
+      },
+      loadConfig: (config, label, note, chain) => {
+        setCfg(config);
+        setPresetKey(chain);
+        setPresetLabel(label);
+        setPresetNote(note);
         setDirty(false);
       },
       markDirty: () => setDirty(true),
     }),
-    [cfg, running, presetKey, cpu],
+    [cfg, running, presetKey, presetLabel, presetNote, cpu],
   );
 
   const handleSignOut = async () => {
@@ -135,7 +152,13 @@ export default function Dashboard() {
                 size="sm"
                 variant="ghost"
                 className="gap-1.5 text-muted-foreground"
-                onClick={() => setCfg(getPreset(presetKey).config)}
+                onClick={() => {
+                  const p = getPreset(presetKey);
+                  setCfg(p.config);
+                  setPresetLabel(p.name);
+                  setPresetNote(p.note);
+                  setDirty(false);
+                }}
                 title="Reset this preset to factory values"
               >
                 <RotateCcw className="size-3.5" />
@@ -147,8 +170,11 @@ export default function Dashboard() {
               <Segmented<PresetKey>
                 value={presetKey}
                 onChange={(v) => {
-                  setCfg(getPreset(v).config);
+                  const p = getPreset(v);
+                  setCfg(p.config);
                   setPresetKey(v);
+                  setPresetLabel(p.name);
+                  setPresetNote(p.note);
                   setDirty(false);
                 }}
                 options={PRESET_TABS}
@@ -226,13 +252,13 @@ export default function Dashboard() {
             <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-x-6 gap-y-1.5 px-4 py-2 sm:px-6">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
                 <span className="font-mono text-[10px] tracking-wider text-[#F5A524]">
-                  {preset.name.toUpperCase()}
+                  {presetLabel.toUpperCase()}
                 </span>
                 <span className="text-[10px] text-muted-foreground">
                   {preset.target}
                 </span>
                 <span className="hidden text-[10px] text-muted-foreground/80 md:inline">
-                  {preset.note}
+                  {presetNote}
                 </span>
               </div>
               <div className="flex items-center gap-x-5 gap-y-1 font-mono text-[10px] tabular-nums text-muted-foreground">
@@ -261,11 +287,15 @@ export default function Dashboard() {
           <ImagingSection />
           <OutputChainsSection />
           <RdsSection />
+          <FactoryPresetsSection />
+          <AdvancedSection target={target} ceiling={ceiling} />
+          <StandaloneSection />
           <ReferenceSection />
 
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-5 pb-2 text-[10px] text-muted-foreground">
             <span>
-              TMAUDIO Digital Broadcast Processing Suite · C++20 · JUCE · AVX2 / NEON
+              TMAUDIO Digital Broadcast Processing Suite — Standalone Edition
+              v1.0 · C++20 · JUCE · AVX2 / NEON
             </span>
             <span className="font-mono tabular-nums">
               FM · DAB+ · WEB · HD — four independent chains, one clock

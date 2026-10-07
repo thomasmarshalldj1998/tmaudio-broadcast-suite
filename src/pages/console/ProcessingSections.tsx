@@ -74,14 +74,24 @@ export function InputSection() {
               <Readout value="dual-speed" unit="" tone="accent" />
             </div>
             <Fader
-              label="Slow · grooming"
+              label="Slow · attack"
               value={i.slowAgcMs}
-              min={100}
+              min={150}
               max={500}
               step={5}
               digits={0}
               unit="ms"
               onChange={(v) => set("input", { slowAgcMs: v })}
+            />
+            <Fader
+              label="Slow · release"
+              value={i.slowReleaseMs}
+              min={400}
+              max={2000}
+              step={10}
+              digits={0}
+              unit="ms"
+              onChange={(v) => set("input", { slowReleaseMs: v })}
             />
             <Fader
               label="Slow · make-up"
@@ -93,7 +103,7 @@ export function InputSection() {
               onChange={(v) => set("input", { slowGain: v })}
             />
             <Fader
-              label="Fast · transient"
+              label="Fast · attack"
               value={i.fastAgcMs}
               min={5}
               max={30}
@@ -101,6 +111,26 @@ export function InputSection() {
               digits={0}
               unit="ms"
               onChange={(v) => set("input", { fastAgcMs: v })}
+            />
+            <Fader
+              label="Fast · hold"
+              value={i.fastHoldMs}
+              min={20}
+              max={100}
+              step={1}
+              digits={0}
+              unit="ms"
+              onChange={(v) => set("input", { fastHoldMs: v })}
+            />
+            <Fader
+              label="Fast · release"
+              value={i.fastReleaseMs}
+              min={50}
+              max={200}
+              step={1}
+              digits={0}
+              unit="ms"
+              onChange={(v) => set("input", { fastReleaseMs: v })}
             />
             <Fader
               label="Fast · make-up"
@@ -313,7 +343,7 @@ export function SensusSection() {
                   <span className="font-mono text-[9px] text-muted-foreground/80">
                     {band.range}
                   </span>
-                  <div className="grid grid-cols-2 gap-y-2 justify-items-center">
+                  <div className="grid grid-cols-3 gap-x-1 gap-y-2 justify-items-center">
                     <Knob
                       label="Thr"
                       value={b.threshold}
@@ -325,6 +355,18 @@ export function SensusSection() {
                       size={44}
                       accent={band.color}
                       onChange={(v) => setBand(idx, { threshold: v })}
+                    />
+                    <Knob
+                      label="Ratio"
+                      value={b.ratio}
+                      min={1}
+                      max={20}
+                      step={0.1}
+                      digits={1}
+                      unit=":1"
+                      size={44}
+                      accent={band.color}
+                      onChange={(v) => setBand(idx, { ratio: v })}
                     />
                     <Knob
                       label="Atk"

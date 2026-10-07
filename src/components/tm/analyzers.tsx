@@ -255,9 +255,8 @@ export function MpxAnalyzer({
         const roll = edge < 3 ? edge / 3 : 1;
         const shaped =
           topDb +
-          jitter(seed + i) -
-          (1 - roll) * 6 +
-          Math.sin(i * 1.7 + seed + t) * 1.2;
+          (jitter(seed + i) + Math.sin(i * 1.7 + seed + t) * 1.2) * 0.35 -
+          (1 - roll) * 6;
         ctx.lineTo(x(f), dbToY(shaped));
       }
       ctx.lineTo(x(f1), h);
@@ -269,10 +268,10 @@ export function MpxAnalyzer({
       ctx.fill();
     };
 
-    // L+R baseband 0-15 kHz (pre-emphasis raises the top end)
-    const tilt = emphasis === 75 ? 4.4 : 3.5;
+    // L+R baseband 0-15 kHz @ 90 % modulation (flat within ±0.05 dB)
+    const tau = emphasis === 75 ? 75e-6 : 50e-6;
     if (running) {
-      region(0, 15000, -3 + tilt * 0.4, "rgba(245,165,36,0.85)", 1);
+      region(0, 15000, 20 * Math.log10(0.9), "rgba(245,165,36,0.85)", 1);
       // L-R DSB-SC 23-53 kHz
       region(
         23000,
@@ -313,6 +312,25 @@ export function MpxAnalyzer({
     ctx.fillStyle = "rgba(255,255,255,0.32)";
     ctx.font = "9px ui-monospace, monospace";
     ctx.fillText("38k DSB-SC", x(38000) + 4, 14);
+
+    // Pre-emphasis curve applied ahead of the limiter (50 / 75 µs)
+    ctx.beginPath();
+    for (let i = 0; i <= 60; i++) {
+      const f = 100 * Math.pow(150, i / 60); // 100 Hz -> 15 kHz, log axis
+      const boost =
+        10 *
+        Math.log10(
+          (1 + Math.pow(2 * Math.PI * f * tau, 2)) /
+            (1 + Math.pow(2 * Math.PI * 1000 * tau, 2)),
+        );
+      const py = dbToY(20 * Math.log10(0.9) + boost * 0.5);
+      if (i === 0) ctx.moveTo(x(f), py);
+      else ctx.lineTo(x(f), py);
+    }
+    ctx.strokeStyle = "rgba(255,255,255,0.4)";
+    ctx.setLineDash([2, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
     // ITU-R SM.1268 mask
     if (maskEnforce) {
@@ -611,6 +629,86 @@ export function BiphaseScope({
       <span className="pointer-events-none absolute top-1.5 left-2.5 font-mono text-[9px] tracking-wider text-white/35">
         BIPHASE @ 1187.5 Bd
       </span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Loudness history — momentary / short-term / integrated traces
+ * ------------------------------------------------------------------ */
+
+export function LoudnessHistory({
+  target,
+  running,
+}: {
+  target: number;
+  running: boolean;
+}) {
+  const ref = useCanvas((ctx, w, h, t) => {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "#0A0C0E";
+    ctx.fillRect(0, 0, w, h);
+    grid(ctx, w, h, { cols: 10, rows: 5 });
+
+    const lo = target - 18;
+    const hi = target + 12;
+    const y = (lu: number) => h - 6 - ((lu - lo) / (hi - lo)) * (h - 14);
+    const span = 600; // 10 minute history
+
+    const momentary = (s: number) =>
+      target + Math.sin(s * 1.9) * 5.5 + Math.sin(s * 7.3) * 2.2 +
+      Math.pow(Math.max(0, Math.sin(s * Math.PI * 2 * 1.9)), 8) * 3;
+    const shortTerm = (s: number) =>
+      target + Math.sin(s * 0.31) * 3 + Math.sin(s * 1.1) * 1.2;
+    const integrated = (s: number) =>
+      target + Math.sin(s * 0.07) * 1.1 + Math.sin(s * 0.19) * 0.4;
+
+    const trace = (
+      fn: (s: number) => number,
+      color: string,
+      width: number,
+    ) => {
+      ctx.beginPath();
+      for (let px = 0; px <= w; px++) {
+        const s = t - span + (px / w) * span;
+        const lu = running ? fn(s) : lo + 1;
+        if (px === 0) ctx.moveTo(px, y(lu));
+        else ctx.lineTo(px, y(lu));
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+      ctx.lineWidth = 1;
+    };
+
+    // EBU R128 target line
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(0, y(target));
+    ctx.lineTo(w, y(target));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    trace(momentary, "rgba(245,165,36,0.45)", 1);
+    trace(shortTerm, "rgba(245,165,36,0.85)", 1.4);
+    trace(integrated, "#4ADE80", 1.8);
+
+    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.font = "9px ui-monospace, monospace";
+    ctx.fillText("−10 min", 4, h - 4);
+    ctx.fillText("now", w - 26, h - 4);
+    ctx.fillText(`${target} LUFS`, 4, y(target) - 4);
+  });
+
+  return (
+    <div className="relative h-[150px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
+      <canvas ref={ref} className="block" />
+      <div className="pointer-events-none absolute top-2 right-2.5 flex gap-3 font-mono text-[9px] tracking-wider">
+        <span className="text-[#4ADE80]">— INT</span>
+        <span className="text-[#F5A524]">— S</span>
+        <span className="text-[#F5A524]/50">— M</span>
+      </div>
     </div>
   );
 }
