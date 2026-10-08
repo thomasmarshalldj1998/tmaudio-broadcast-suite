@@ -1,5 +1,14 @@
 # DEVELOPER REFERENCE — block diagram & filter specification
 
+> **v2.0 target specification:** [`specification.md`](./specification.md) — mission,
+> 24-band Bark psychoacoustic engine, 13-stage signal flow with algorithms and filter
+> specs, transmission stack, latency budget, performance targets ·
+> [`implementation.md`](./implementation.md) — preset parameter tables, C/C++ skeleton
+> with prototypes, roadmap, validation plan.
+>
+> This document describes the **foundation** (Sensus 6-band) architecture that ships
+> today; the deltas to the 8-band Bark-derived target are listed in `specification.md` §0.
+
 ```
  ┌──────────┐   ┌──────────┐   ┌──────────────────────────────────┐
  │ Input    │──▶│ Repair   │──▶│ Dual-loop AGC                    │
