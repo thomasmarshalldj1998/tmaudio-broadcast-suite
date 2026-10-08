@@ -40,7 +40,7 @@ function Flag({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#0E1014] px-3 py-2 transition-colors hover:border-border">
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#1E232A] px-3 py-2 transition-colors hover:border-border">
       <span className="text-[11px] font-medium text-foreground/90">{label}</span>
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
@@ -237,7 +237,7 @@ export function RdsSection() {
           />
 
           {/* --- dynamic RadioText push queue -------------------------- */}
-          <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-[#0E1014] p-3">
+          <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-[#1E232A] p-3">
             <div className="flex items-center justify-between">
               <Legend>RadioText push queue</Legend>
               <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
@@ -260,7 +260,7 @@ export function RdsSection() {
                   >
                     <span
                       className={`size-1.5 shrink-0 rounded-full ${
-                        onAir ? "bg-[#35C8D8]" : "bg-[#2A2E36]"
+                        onAir ? "bg-[#35C8D8]" : "bg-[#444C59]"
                       }`}
                     />
                     <span className="truncate font-mono text-[10px] text-foreground/80">
@@ -301,7 +301,7 @@ export function RdsSection() {
         {/* --- group table --------------------------------------------- */}
         <div className="flex flex-col gap-4">
           <div className="overflow-x-auto rounded-lg border border-border/60">
-            <div className="grid grid-cols-[64px_1fr_84px_84px_66px] gap-2 border-b border-border/60 bg-[#0E1014] px-3 py-2 text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+            <div className="grid grid-cols-[64px_1fr_84px_84px_66px] gap-2 border-b border-border/60 bg-[#1E232A] px-3 py-2 text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
               <span>Group</span>
               <span>Blocks A B C D</span>
               <span>CRC-10</span>
@@ -315,7 +315,7 @@ export function RdsSection() {
                 return (
                   <div
                     key={`${g.label}-${gi}`}
-                    className="grid grid-cols-[64px_1fr_84px_84px_66px] items-center gap-2 px-3 py-2 transition-colors hover:bg-[#14171C]"
+                    className="grid grid-cols-[64px_1fr_84px_84px_66px] items-center gap-2 px-3 py-2 transition-colors hover:bg-[#2A313A]"
                   >
                     <span className="flex flex-col">
                       <span className="font-mono text-[12px] font-semibold text-[#35C8D8]">
@@ -371,7 +371,7 @@ export function RdsSection() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-[#0E1014] p-4">
+            <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-[#1E232A] p-4">
               <Legend>Phase lock</Legend>
               <div className="flex items-baseline justify-between">
                 <span className="text-[11px] text-muted-foreground">Pilot</span>

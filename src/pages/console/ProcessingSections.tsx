@@ -28,7 +28,7 @@ function Toggle({
   note?: string;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#0E1014] px-3 py-2.5 transition-colors hover:border-border">
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#1E232A] px-3 py-2.5 transition-colors hover:border-border">
       <span className="flex flex-col gap-1">
         <span className="text-[11px] font-medium text-foreground/90">{label}</span>
         {note ? (
@@ -68,7 +68,7 @@ export function InputSection() {
     >
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-4 rounded-lg border border-border/50 bg-[#0E1014] p-4">
+          <div className="flex flex-col gap-4 rounded-lg border border-border/50 bg-[#1E232A] p-4">
             <div className="flex items-center justify-between">
               <Legend>Wideband AGC</Legend>
               <Readout value="dual-speed" unit="" tone="accent" />
@@ -143,7 +143,7 @@ export function InputSection() {
             />
           </div>
 
-          <div className="flex flex-col gap-4 rounded-lg border border-border/50 bg-[#0E1014] p-4">
+          <div className="flex flex-col gap-4 rounded-lg border border-border/50 bg-[#1E232A] p-4">
             <div className="flex items-center justify-between">
               <Legend>Input repair</Legend>
               <Readout value="pre-AGC" />
@@ -326,7 +326,7 @@ export function SensusSection() {
               return (
                 <div
                   key={band.index}
-                  className="flex flex-col gap-3 rounded-lg border border-border/60 bg-[#0E1014] p-3 transition-colors hover:border-border"
+                  className="flex flex-col gap-3 rounded-lg border border-border/60 bg-[#1E232A] p-3 transition-colors hover:border-border"
                 >
                   <div className="flex items-baseline justify-between gap-1">
                     <span
@@ -440,7 +440,7 @@ export function SensusSection() {
             mode={s.mode}
             thresholds={s.bands.map((b) => b.threshold)}
           />
-          <div className="rounded-lg border border-border/50 bg-[#0E1014] p-3">
+          <div className="rounded-lg border border-border/50 bg-[#1E232A] p-3">
             <Legend className="mb-2">Timing law</Legend>
             <ul className="space-y-1.5 text-[10px] leading-relaxed text-muted-foreground">
               <li className="flex justify-between gap-2">

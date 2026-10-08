@@ -121,9 +121,9 @@ const STANDARDS = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-[#0B0C0E] text-foreground">
+    <div className="min-h-screen bg-[#181C22] text-foreground">
       {/* ------------------------------ nav ------------------------------ */}
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-[#0B0C0E]/92 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-border/60 bg-[#181C22]/92 backdrop-blur">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-3">
             <img
@@ -187,7 +187,7 @@ export default function Landing() {
           className="pointer-events-none absolute inset-0 opacity-[0.35]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)",
+              "linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px)",
             backgroundSize: "44px 44px",
             maskImage: "radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent)",
           }}
@@ -233,7 +233,7 @@ export default function Landing() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-border/80 bg-[#121417] hover:bg-[#171A1F]"
+                className="border-border/80 bg-[#242A32] hover:bg-[#2E3540]"
               >
                 <Link to="/auth?returnTo=%2Fdashboard">Sign in to save presets</Link>
               </Button>
@@ -264,8 +264,8 @@ export default function Landing() {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="mt-12"
           >
-            <div className="overflow-hidden rounded-xl border border-border/70 bg-[#121417] shadow-[0_30px_80px_-50px_rgba(0,0,0,1)]">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 bg-[#161A1F] px-4 py-3">
+            <div className="overflow-hidden rounded-xl border border-border/70 bg-[#242A32] shadow-[0_30px_80px_-50px_rgba(0,0,0,1)]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 bg-[#2C333D] px-4 py-3">
                 <div className="flex items-center gap-3">
                   <span className="h-3.5 w-[2px] rounded-full bg-[#F5A524] shadow-[0_0_6px_#F5A52488]" />
                   <div>
@@ -303,7 +303,7 @@ export default function Landing() {
       </section>
 
       {/* ------------------------------ flow ----------------------------- */}
-      <section className="border-y border-border/60 bg-[#0E1014]">
+      <section className="border-y border-border/60 bg-[#1E232A]">
         <div className="mx-auto max-w-[1240px] px-4 py-8 sm:px-6">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
             {FLOW.map((stage, i) => (
@@ -315,7 +315,7 @@ export default function Landing() {
                 transition={{ duration: 0.4, delay: i * 0.06 }}
                 className="flex items-center gap-2"
               >
-                <span className="rounded-md border border-border/70 bg-[#14171C] px-3 py-2 text-[11px] whitespace-nowrap text-foreground/85">
+                <span className="rounded-md border border-border/70 bg-[#2A313A] px-3 py-2 text-[11px] whitespace-nowrap text-foreground/85">
                   <span className="mr-2 font-mono text-[10px] text-[#F5A524]">
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -352,10 +352,10 @@ export default function Landing() {
               key={chain.key}
               {...rise}
               transition={{ ...rise.transition, delay: i * 0.07 }}
-              className="group flex flex-col overflow-hidden rounded-xl border border-border/70 bg-[#121417] transition-colors hover:border-border"
+              className="group flex flex-col overflow-hidden rounded-xl border border-border/70 bg-[#242A32] transition-colors hover:border-border"
             >
               <div
-                className="flex items-center justify-between border-b border-border/60 bg-[#161A1F] px-4 py-3"
+                className="flex items-center justify-between border-b border-border/60 bg-[#2C333D] px-4 py-3"
                 style={{ boxShadow: `inset 0 2px 0 0 ${chain.color}` }}
               >
                 <span className="font-mono text-[10px]" style={{ color: chain.color }}>
@@ -392,7 +392,7 @@ export default function Landing() {
       </section>
 
       {/* ----------------------------- sensus ---------------------------- */}
-      <section id="sensus" className="border-y border-border/60 bg-[#0E1014]">
+      <section id="sensus" className="border-y border-border/60 bg-[#1E232A]">
         <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_minmax(0,460px)]">
           <motion.div {...rise}>
             <span className="text-[10px] tracking-[0.2em] text-[#F5A524] uppercase">
@@ -414,7 +414,7 @@ export default function Landing() {
             <div className="mt-8 overflow-hidden rounded-lg border border-border/60">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-border/60 bg-[#14171C] text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+                  <tr className="border-b border-border/60 bg-[#2A313A] text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
                     <th className="px-3 py-2 font-medium">Band</th>
                     <th className="px-3 py-2 font-medium">Range</th>
                     <th className="px-3 py-2 font-medium">Threshold</th>
@@ -425,7 +425,7 @@ export default function Landing() {
                   {BANDS.map((b, i) => {
                     const cfg = BASE_CONFIG.sensus.bands[i];
                     return (
-                      <tr key={b.index} className="hover:bg-[#14171C]">
+                      <tr key={b.index} className="hover:bg-[#2A313A]">
                         <td className="px-3 py-2 text-[12px] font-medium">
                           <span className="mr-2 font-mono text-[10px]" style={{ color: b.color }}>
                             {i + 1}
@@ -450,7 +450,7 @@ export default function Landing() {
           </motion.div>
 
           <motion.div {...rise} transition={{ ...rise.transition, delay: 0.1 }}>
-            <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-[#121417] p-4">
+            <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-[#242A32] p-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
                   Live band activity
@@ -465,19 +465,19 @@ export default function Landing() {
                 thresholds={BASE_CONFIG.sensus.bands.map((b) => b.threshold)}
               />
               <div className="grid gap-3 text-[11px] leading-relaxed text-muted-foreground sm:grid-cols-3">
-                <div className="rounded-lg border border-border/50 bg-[#0E1014] p-3">
+                <div className="rounded-lg border border-border/50 bg-[#1E232A] p-3">
                   <span className="block text-[10px] tracking-[0.14em] text-foreground/80 uppercase">
                     Drums
                   </span>
                   fast attack · fast release
                 </div>
-                <div className="rounded-lg border border-border/50 bg-[#0E1014] p-3">
+                <div className="rounded-lg border border-border/50 bg-[#1E232A] p-3">
                   <span className="block text-[10px] tracking-[0.14em] text-foreground/80 uppercase">
                     Music
                   </span>
                   slow attack · programme release
                 </div>
-                <div className="rounded-lg border border-border/50 bg-[#0E1014] p-3">
+                <div className="rounded-lg border border-border/50 bg-[#1E232A] p-3">
                   <span className="block text-[10px] tracking-[0.14em] text-foreground/80 uppercase">
                     Speech
                   </span>
@@ -502,11 +502,11 @@ export default function Landing() {
 
         <motion.div
           {...rise}
-          className="mt-8 overflow-x-auto rounded-xl border border-border/70 bg-[#121417]"
+          className="mt-8 overflow-x-auto rounded-xl border border-border/70 bg-[#242A32]"
         >
           <table className="w-full min-w-[760px] border-collapse text-left">
             <thead>
-              <tr className="border-b border-border/60 bg-[#161A1F] text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+              <tr className="border-b border-border/60 bg-[#2C333D] text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
                 <th className="px-4 py-3 font-medium">Area</th>
                 <th className="px-4 py-3 font-medium text-[#F5A524]">
                   TMAUDIO
@@ -517,7 +517,7 @@ export default function Landing() {
             </thead>
             <tbody className="divide-y divide-border/50">
               {VS.map(([area, tmaudio, others]) => (
-                <tr key={area} className="hover:bg-[#161A1F]">
+                <tr key={area} className="hover:bg-[#2C333D]">
                   <td className="px-4 py-3 text-[12px] font-medium text-foreground/90">
                     {area}
                   </td>
@@ -538,7 +538,7 @@ export default function Landing() {
       </section>
 
       {/* --------------------------- deliverables ------------------------ */}
-      <section id="open" className="border-t border-border/60 bg-[#0E1014]">
+      <section id="open" className="border-t border-border/60 bg-[#1E232A]">
         <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)]">
           <motion.div {...rise}>
             <span className="text-[10px] tracking-[0.2em] text-[#F5A524] uppercase">
@@ -551,7 +551,7 @@ export default function Landing() {
               {DELIVERABLES.map(([title, note]) => (
                 <li
                   key={title}
-                  className="flex gap-3 rounded-lg border border-border/60 bg-[#121417] p-3.5"
+                  className="flex gap-3 rounded-lg border border-border/60 bg-[#242A32] p-3.5"
                 >
                   <span className="mt-0.5 text-[#4ADE80]">✓</span>
                   <span className="flex flex-col gap-1">
@@ -570,7 +570,7 @@ export default function Landing() {
               {STANDARDS.map(([title, note]) => (
                 <div
                   key={title}
-                  className="rounded-lg border border-border/50 bg-[#121417] p-3"
+                  className="rounded-lg border border-border/50 bg-[#242A32] p-3"
                 >
                   <span className="block text-[11px] font-medium text-foreground/90">
                     {title}
@@ -586,7 +586,7 @@ export default function Landing() {
           <motion.pre
             {...rise}
             transition={{ ...rise.transition, delay: 0.1 }}
-            className="overflow-x-auto rounded-xl border border-border/70 bg-[#0A0C0E] p-5 font-mono text-[11px] leading-[1.7] text-foreground/80"
+            className="overflow-x-auto rounded-xl border border-border/70 bg-[#12161B] p-5 font-mono text-[11px] leading-[1.7] text-foreground/80"
           >{`// src/sensus/DensityTiming.h — no fixed times exist
 struct Timings { double attackMs, releaseMs; };
 
@@ -612,7 +612,7 @@ uint16_t checkword(uint16_t block, uint16_t offset) {
       <section className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20">
         <motion.div
           {...rise}
-          className="relative overflow-hidden rounded-2xl border border-border/70 bg-[#121417] px-6 py-12 text-center sm:px-12 sm:py-16"
+          className="relative overflow-hidden rounded-2xl border border-border/70 bg-[#242A32] px-6 py-12 text-center sm:px-12 sm:py-16"
         >
           <div
             className="pointer-events-none absolute inset-0 opacity-40"
@@ -644,7 +644,7 @@ uint16_t checkword(uint16_t block, uint16_t offset) {
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-border/80 bg-[#0E1014] hover:bg-[#14171C]"
+                className="border-border/80 bg-[#1E232A] hover:bg-[#2A313A]"
               >
                 <Link to="/auth">Create an account</Link>
               </Button>

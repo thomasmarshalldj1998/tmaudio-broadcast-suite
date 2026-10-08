@@ -132,7 +132,7 @@ export function FactoryPresetsSection() {
                   className={`flex flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-all ${
                     active
                       ? "border-[#4ADE80]/50 bg-[#4ADE80]/10"
-                      : "border-border/60 bg-[#0E1014] hover:border-border"
+                      : "border-border/60 bg-[#1E232A] hover:border-border"
                   }`}
                 >
                   <span
@@ -167,8 +167,8 @@ export function FactoryPresetsSection() {
                   onClick={() => setSelectedId(p.id)}
                   className={`flex flex-col gap-2 rounded-lg border p-3 text-left transition-all ${
                     active
-                      ? "border-[#4ADE80]/50 bg-[#141A16] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
-                      : "border-border/60 bg-[#0E1014] hover:border-border"
+                      ? "border-[#4ADE80]/50 bg-[#1F2A24] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
+                      : "border-border/60 bg-[#1E232A] hover:border-border"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">

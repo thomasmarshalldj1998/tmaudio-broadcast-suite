@@ -139,7 +139,7 @@ export function SpectrumAnalyzer({
   const peaks = useRef<number[]>([]);
   const ref = useCanvas((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#0A0C0E";
+    ctx.fillStyle = "#12161B";
     ctx.fillRect(0, 0, w, h);
     grid(ctx, w, h, { cols: 8, rows: 5 });
 
@@ -192,16 +192,16 @@ export function SpectrumAnalyzer({
   return (
     <div className="relative h-[168px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
       <canvas ref={ref} className="block" />
-      <span className="pointer-events-none absolute top-2 left-2.5 font-mono text-[9px] tracking-wider text-white/35">
+      <span className="pointer-events-none absolute top-2 left-2.5 font-mono text-[9px] tracking-wider text-white/65">
         20 Hz
       </span>
-      <span className="pointer-events-none absolute top-2 right-2.5 font-mono text-[9px] tracking-wider text-white/35">
+      <span className="pointer-events-none absolute top-2 right-2.5 font-mono text-[9px] tracking-wider text-white/65">
         20 kHz
       </span>
-      <span className="pointer-events-none absolute bottom-2 left-2.5 font-mono text-[9px] tracking-wider text-white/35">
+      <span className="pointer-events-none absolute bottom-2 left-2.5 font-mono text-[9px] tracking-wider text-white/65">
         0 dB
       </span>
-      <span className="pointer-events-none absolute bottom-2 left-14 font-mono text-[9px] tracking-wider text-white/25">
+      <span className="pointer-events-none absolute bottom-2 left-14 font-mono text-[9px] tracking-wider text-white/60">
         −60
       </span>
     </div>
@@ -229,7 +229,7 @@ export function MpxAnalyzer({
 }) {
   const ref = useCanvas((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#0A0C0E";
+    ctx.fillStyle = "#12161B";
     ctx.fillRect(0, 0, w, h);
     grid(ctx, w, h, { cols: 10, rows: 4 });
 
@@ -309,7 +309,7 @@ export function MpxAnalyzer({
     ctx.lineTo(x(38000), h);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = "rgba(255,255,255,0.32)";
+    ctx.fillStyle = "rgba(255,255,255,0.62)";
     ctx.font = "9px ui-monospace, monospace";
     ctx.fillText("38k DSB-SC", x(38000) + 4, 14);
 
@@ -350,7 +350,7 @@ export function MpxAnalyzer({
     }
 
     // frequency axis
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.fillStyle = "rgba(255,255,255,0.62)";
     ctx.font = "9px ui-monospace, monospace";
     for (let f = 10000; f <= 100000; f += 10000) {
       ctx.fillText(`${f / 1000}k`, x(f) + 2, h - 3);
@@ -361,11 +361,11 @@ export function MpxAnalyzer({
     <div className="relative h-[196px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
       <canvas ref={ref} className="block" />
       <div className="pointer-events-none absolute top-2 right-2.5 flex items-center gap-3 font-mono text-[9px] tracking-wider">
-        <span className="flex items-center gap-1 text-white/40">
+        <span className="flex items-center gap-1 text-white/70">
           <span className="inline-block h-px w-4 border-t border-dashed border-[#FF4D4D]" />
           SM.1268
         </span>
-        <span className="text-white/40">−60 → 0 dB rel. 100 %</span>
+        <span className="text-white/70">−60 → 0 dB rel. 100 %</span>
       </div>
     </div>
   );
@@ -388,7 +388,7 @@ export function BandActivity({
 }) {
   const ref = useCanvas((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#0A0C0E";
+    ctx.fillStyle = "#12161B";
     ctx.fillRect(0, 0, w, h);
     grid(ctx, w, h, { cols: 6, rows: 4 });
 
@@ -425,7 +425,7 @@ export function BandActivity({
         ctx.fillRect(x0 + 7, top + barH - 1, colW - 14, 1);
       }
 
-      ctx.fillStyle = "rgba(255,255,255,0.42)";
+      ctx.fillStyle = "rgba(255,255,255,0.65)";
       ctx.font = "9px ui-monospace, monospace";
       ctx.textAlign = "center";
       ctx.fillText(band.name.slice(0, 4).toUpperCase(), x0 + colW / 2, h - 12);
@@ -438,7 +438,7 @@ export function BandActivity({
   return (
     <div className="relative h-[210px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
       <canvas ref={ref} className="block" />
-      <span className="pointer-events-none absolute top-2 left-2.5 font-mono text-[9px] tracking-wider text-white/35">
+      <span className="pointer-events-none absolute top-2 left-2.5 font-mono text-[9px] tracking-wider text-white/65">
         GR dB
       </span>
     </div>
@@ -491,7 +491,7 @@ export function LevelMeter({
           <span className="ml-0.5 text-[9px] text-muted-foreground">{unit}</span>
         </span>
       </div>
-      <div className="relative h-2.5 overflow-hidden rounded-full bg-[#0A0C0E] ring-1 ring-black/70 ring-inset">
+      <div className="relative h-2.5 overflow-hidden rounded-full bg-[#12161B] ring-1 ring-black/70 ring-inset">
         <div
           className="h-full rounded-full transition-[width] duration-75"
           style={{ width: `${pct}%`, background: fill, boxShadow: `0 0 8px ${fill}55` }}
@@ -524,7 +524,7 @@ export function CorrelationScope({
 }) {
   const ref = useCanvas((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#0A0C0E";
+    ctx.fillStyle = "#12161B";
     ctx.fillRect(0, 0, w, h);
     grid(ctx, w, h, { cols: 4, rows: 4 });
 
@@ -565,10 +565,10 @@ export function CorrelationScope({
   return (
     <div className="relative h-[132px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
       <canvas ref={ref} className="block" />
-      <span className="pointer-events-none absolute bottom-1.5 left-2 font-mono text-[9px] text-white/30">
+      <span className="pointer-events-none absolute bottom-1.5 left-2 font-mono text-[9px] text-white/60">
         MONO
       </span>
-      <span className="pointer-events-none absolute top-1.5 right-2 font-mono text-[9px] text-white/30">
+      <span className="pointer-events-none absolute top-1.5 right-2 font-mono text-[9px] text-white/60">
         SIDE
       </span>
     </div>
@@ -588,7 +588,7 @@ export function BiphaseScope({
 }) {
   const ref = useCanvas((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#0A0C0E";
+    ctx.fillStyle = "#12161B";
     ctx.fillRect(0, 0, w, h);
     grid(ctx, w, h, { cols: 8, rows: 3 });
 
@@ -626,7 +626,7 @@ export function BiphaseScope({
   return (
     <div className="relative h-[96px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
       <canvas ref={ref} className="block" />
-      <span className="pointer-events-none absolute top-1.5 left-2.5 font-mono text-[9px] tracking-wider text-white/35">
+      <span className="pointer-events-none absolute top-1.5 left-2.5 font-mono text-[9px] tracking-wider text-white/65">
         BIPHASE @ 1187.5 Bd
       </span>
     </div>
@@ -646,7 +646,7 @@ export function LoudnessHistory({
 }) {
   const ref = useCanvas((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#0A0C0E";
+    ctx.fillStyle = "#12161B";
     ctx.fillRect(0, 0, w, h);
     grid(ctx, w, h, { cols: 10, rows: 5 });
 
@@ -694,7 +694,7 @@ export function LoudnessHistory({
     trace(shortTerm, "rgba(245,165,36,0.85)", 1.4);
     trace(integrated, "#4ADE80", 1.8);
 
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.fillStyle = "rgba(255,255,255,0.62)";
     ctx.font = "9px ui-monospace, monospace";
     ctx.fillText("−10 min", 4, h - 4);
     ctx.fillText("now", w - 26, h - 4);
@@ -728,7 +728,7 @@ export function CompositeWaveform({
 }) {
   const ref = useCanvas((ctx, w, h, t) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#0A0C0E";
+    ctx.fillStyle = "#12161B";
     ctx.fillRect(0, 0, w, h);
     grid(ctx, w, h, { cols: 12, rows: 6 });
 

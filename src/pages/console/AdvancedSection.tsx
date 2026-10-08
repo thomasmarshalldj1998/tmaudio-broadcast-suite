@@ -98,7 +98,7 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#0E1014] px-3 py-2.5 transition-colors hover:border-border">
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#1E232A] px-3 py-2.5 transition-colors hover:border-border">
       <span className="flex flex-col gap-1">
         <span className="text-[11px] font-medium text-foreground/90">{label}</span>
         <span className="text-[9px] tracking-wider text-muted-foreground uppercase">
@@ -254,7 +254,7 @@ export function AdvancedSection({
         </div>
 
         {/* ---------------- compliance log ---------------- */}
-        <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-[#0E1014] p-4">
+        <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-[#1E232A] p-4">
           <div className="flex items-center justify-between">
             <Legend>24 h compliance log</Legend>
             <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
@@ -263,7 +263,7 @@ export function AdvancedSection({
           </div>
 
           <div className="overflow-hidden rounded-md border border-border/50">
-            <div className="grid grid-cols-[86px_54px_54px_54px] gap-1 border-b border-border/50 bg-[#14171C] px-2 py-1.5 text-[8px] tracking-[0.1em] text-muted-foreground uppercase">
+            <div className="grid grid-cols-[86px_54px_54px_54px] gap-1 border-b border-border/50 bg-[#2A313A] px-2 py-1.5 text-[8px] tracking-[0.1em] text-muted-foreground uppercase">
               <span>Time</span>
               <span className="text-right">LUFS</span>
               <span className="text-right">dBTP</span>

@@ -318,7 +318,7 @@ export function ReferenceSection() {
                 className={`flex flex-col gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors ${
                   presetKey === key
                     ? "border-[#8B7CF6]/60 bg-[#8B7CF6]/10"
-                    : "border-border/60 bg-[#0E1014] hover:border-border"
+                    : "border-border/60 bg-[#1E232A] hover:border-border"
                 }`}
               >
                 <span className="text-[11px] font-medium text-foreground/90">
@@ -340,7 +340,7 @@ export function ReferenceSection() {
 
       {tab === "architecture" && (
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <pre className="overflow-x-auto rounded-lg border border-border/60 bg-[#0A0C0E] p-4 font-mono text-[11px] leading-[1.6] text-foreground/80">
+          <pre className="overflow-x-auto rounded-lg border border-border/60 bg-[#12161B] p-4 font-mono text-[11px] leading-[1.6] text-foreground/80">
             {TREE}
           </pre>
           <div className="flex flex-col gap-3">
@@ -364,7 +364,7 @@ export function ReferenceSection() {
                 </li>
               ))}
             </ul>
-            <div className="rounded-lg border border-border/50 bg-[#0E1014] p-3 text-[10px] leading-relaxed text-muted-foreground">
+            <div className="rounded-lg border border-border/50 bg-[#1E232A] p-3 text-[10px] leading-relaxed text-muted-foreground">
               SIMD kernels dispatch at runtime: AVX2 on x86-64, NEON on Apple
               Silicon and ARM Linux, scalar fallback everywhere else — one source
               tree, identical output on all three.
@@ -374,13 +374,13 @@ export function ReferenceSection() {
       )}
 
       {tab === "pipeline" && (
-        <pre className="overflow-x-auto rounded-lg border border-border/60 bg-[#0A0C0E] p-4 font-mono text-[11px] leading-[1.65] text-foreground/80">
+        <pre className="overflow-x-auto rounded-lg border border-border/60 bg-[#12161B] p-4 font-mono text-[11px] leading-[1.65] text-foreground/80">
           {PIPELINE}
         </pre>
       )}
 
       {tab === "build" && (
-        <pre className="overflow-x-auto rounded-lg border border-border/60 bg-[#0A0C0E] p-4 font-mono text-[11px] leading-[1.65] text-foreground/80">
+        <pre className="overflow-x-auto rounded-lg border border-border/60 bg-[#12161B] p-4 font-mono text-[11px] leading-[1.65] text-foreground/80">
           {BUILD}
         </pre>
       )}
@@ -390,7 +390,7 @@ export function ReferenceSection() {
           <div className="overflow-x-auto rounded-lg border border-border/60">
             <table className="w-full min-w-[860px] border-collapse text-left">
               <thead>
-                <tr className="border-b border-border/60 bg-[#0E1014] text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+                <tr className="border-b border-border/60 bg-[#1E232A] text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
                   <th className="px-3 py-2.5 font-medium">Area</th>
                   <th className="px-3 py-2.5 font-medium text-[#F5A524]">
                     TMAUDIO
@@ -402,7 +402,7 @@ export function ReferenceSection() {
               </thead>
               <tbody className="divide-y divide-border/50">
                 {COMPARE.map((row) => (
-                  <tr key={row.area} className="align-top hover:bg-[#14171C]">
+                  <tr key={row.area} className="align-top hover:bg-[#2A313A]">
                     <td className="px-3 py-3 text-[11px] font-medium text-foreground/90">
                       {row.area}
                     </td>
@@ -431,7 +431,7 @@ export function ReferenceSection() {
               {STANDARDS.map(([title, how]) => (
                 <div
                   key={title}
-                  className="flex gap-3 rounded-lg border border-border/60 bg-[#0E1014] p-3"
+                  className="flex gap-3 rounded-lg border border-border/60 bg-[#1E232A] p-3"
                 >
                   <span className="mt-0.5 text-[#4ADE80]">✓</span>
                   <span className="flex flex-col gap-1">

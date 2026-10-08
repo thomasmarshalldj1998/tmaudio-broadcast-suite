@@ -38,7 +38,7 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#0E1014] px-3 py-2.5 transition-colors hover:border-border">
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#1E232A] px-3 py-2.5 transition-colors hover:border-border">
       <span className="flex flex-col gap-1">
         <span className="text-[11px] font-medium text-foreground/90">{label}</span>
         {note ? (
@@ -66,7 +66,7 @@ function Meters({
   useTick(90);
   const t = performance.now() / 1000;
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-[#0E1014] p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-[#1E232A] p-4">
       <div className="flex items-center justify-between">
         <Legend>Chain meters</Legend>
         <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
@@ -252,7 +252,7 @@ export function OutputChainsSection() {
                 checked={fm.maskEnforce}
                 onChange={(v) => set("fm", { maskEnforce: v })}
               />
-              <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#0E1014] px-3 py-2.5">
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-[#1E232A] px-3 py-2.5">
                 <span className="flex flex-col gap-1">
                   <span className="text-[11px] font-medium text-foreground/90">
                     µMPX RTP / UDP out
@@ -283,7 +283,7 @@ export function OutputChainsSection() {
               extra="FM composite"
             />
             <SpectrumAnalyzer running={running} accent={color} gainDb={2} />
-            <div className="rounded-lg border border-border/50 bg-[#0E1014] p-3 text-[10px] leading-relaxed text-muted-foreground">
+            <div className="rounded-lg border border-border/50 bg-[#1E232A] p-3 text-[10px] leading-relaxed text-muted-foreground">
               The bass stage clips 0–300 Hz on its own path before summation so
               intermodulation products never spread across the multiplex, then
               the main stage soft-clips at {fm.oversample}× and is re-filtered
@@ -376,7 +376,7 @@ export function OutputChainsSection() {
               checked={dab.preShaping}
               onChange={(v) => set("dab", { preShaping: v })}
             />
-            <div className="grid gap-3 rounded-lg border border-border/50 bg-[#0E1014] p-4 text-[11px] leading-relaxed text-muted-foreground sm:grid-cols-3">
+            <div className="grid gap-3 rounded-lg border border-border/50 bg-[#1E232A] p-4 text-[11px] leading-relaxed text-muted-foreground sm:grid-cols-3">
               <p>
                 <span className="block text-[10px] tracking-[0.16em] text-foreground/70 uppercase">
                   Loudness
@@ -490,14 +490,14 @@ export function OutputChainsSection() {
                 accent={color}
                 onChange={(v) => set("web", { tns: v })}
               />
-              <div className="flex flex-col justify-end gap-2 rounded-lg border border-border/60 bg-[#0E1014] px-3 py-2.5">
+              <div className="flex flex-col justify-end gap-2 rounded-lg border border-border/60 bg-[#1E232A] px-3 py-2.5">
                 <Legend>Icecast mount</Legend>
                 <span className="font-mono text-[11px] text-foreground/85">
                   {web.mount}
                 </span>
               </div>
             </div>
-            <div className="grid gap-3 rounded-lg border border-border/50 bg-[#0E1014] p-4 text-[11px] leading-relaxed text-muted-foreground sm:grid-cols-3">
+            <div className="grid gap-3 rounded-lg border border-border/50 bg-[#1E232A] p-4 text-[11px] leading-relaxed text-muted-foreground sm:grid-cols-3">
               <p>
                 <span className="block text-[10px] tracking-[0.16em] text-foreground/70 uppercase">
                   128 kbps sweet spot
@@ -608,7 +608,7 @@ export function OutputChainsSection() {
                 onChange={(v) => set("hd", { hdcPreShaping: v })}
               />
             </div>
-            <div className="grid gap-3 rounded-lg border border-border/50 bg-[#0E1014] p-4 text-[11px] leading-relaxed text-muted-foreground sm:grid-cols-3">
+            <div className="grid gap-3 rounded-lg border border-border/50 bg-[#1E232A] p-4 text-[11px] leading-relaxed text-muted-foreground sm:grid-cols-3">
               <p>
                 <span className="block text-[10px] tracking-[0.16em] text-foreground/70 uppercase">
                   Hybrid balance
@@ -635,7 +635,7 @@ export function OutputChainsSection() {
           <div className="flex flex-col gap-4">
             <Meters target={-16} ceiling={-2} color={color} extra="HD hybrid" />
             <SpectrumAnalyzer running={running} accent={color} gainDb={1.5} />
-            <div className="flex items-center justify-between rounded-lg border border-border/60 bg-[#0E1014] px-3 py-2.5 text-[10px] text-muted-foreground">
+            <div className="flex items-center justify-between rounded-lg border border-border/60 bg-[#1E232A] px-3 py-2.5 text-[10px] text-muted-foreground">
               <span>Digital ref</span>
               <span className="font-mono tabular-nums text-foreground/85">
                 {fixed(hd.digitalRef, 1)} dB

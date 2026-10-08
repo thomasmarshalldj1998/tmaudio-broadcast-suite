@@ -230,7 +230,7 @@ export function StandaloneSection() {
         ].map(([k, v]) => (
           <span
             key={k}
-            className="flex items-center gap-2 rounded-md border border-border/60 bg-[#0E1014] px-2.5 py-1.5"
+            className="flex items-center gap-2 rounded-md border border-border/60 bg-[#1E232A] px-2.5 py-1.5"
           >
             <span className="text-[9px] tracking-[0.14em] text-muted-foreground uppercase">
               {k}
@@ -257,7 +257,7 @@ export function StandaloneSection() {
         </span>
       </div>
 
-      <pre className="max-h-[560px] overflow-auto rounded-lg border border-border/60 bg-[#0A0C0E] p-4 font-mono text-[11px] leading-[1.62] whitespace-pre-wrap text-foreground/80">
+      <pre className="max-h-[560px] overflow-auto rounded-lg border border-border/60 bg-[#12161B] p-4 font-mono text-[11px] leading-[1.62] whitespace-pre-wrap text-foreground/80">
         {body}
       </pre>
     </RackUnit>

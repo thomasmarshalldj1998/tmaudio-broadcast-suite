@@ -72,7 +72,7 @@ export function Led({
       <span
         className="size-[7px] rounded-full transition-all duration-300"
         style={{
-          background: on ? color : "#2A2E36",
+          background: on ? color : "#444C59",
           boxShadow: on ? `0 0 7px ${color}99` : "inset 0 0 2px #000",
         }}
       />
@@ -106,11 +106,11 @@ export function RackUnit({
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-xl border border-border/70 bg-[#121417] shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_18px_40px_-30px_rgba(0,0,0,0.9)]",
+        "overflow-hidden rounded-xl border border-border/70 bg-[#242A32] shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_18px_40px_-30px_rgba(0,0,0,0.9)]",
         className,
       )}
     >
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 bg-[#161A1F] px-4 py-3 sm:px-5">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 bg-[#2C333D] px-4 py-3 sm:px-5">
         <div className="flex items-center gap-3">
           {index ? (
             <span
@@ -178,7 +178,7 @@ export function Segmented<T extends string | number>({
   return (
     <div
       className={cn(
-        "inline-flex w-full rounded-lg border border-border/70 bg-[#0D0F12] p-[3px]",
+        "inline-flex w-full rounded-lg border border-border/70 bg-[#14181E] p-[3px]",
         className,
       )}
       role="radiogroup"
@@ -196,7 +196,7 @@ export function Segmented<T extends string | number>({
               "flex-1 rounded-md font-medium whitespace-nowrap transition-all duration-150",
               size === "sm" ? "px-2 py-1 text-[10px]" : "px-2.5 py-1.5 text-[11px]",
               active
-                ? "bg-[#1D2127] text-foreground shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset]"
+                ? "bg-[#39424E] text-foreground shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset]"
                 : "text-muted-foreground hover:text-foreground/80",
             )}
             style={active ? { color: accent, boxShadow: `inset 0 -2px 0 0 ${accent}` } : undefined}
@@ -241,7 +241,7 @@ export function Fader({
         <Readout value={fixed(value, digits)} unit={unit} />
       </div>
       <div className="relative h-6 select-none">
-        <div className="absolute inset-x-0 top-1/2 h-[5px] -translate-y-1/2 overflow-hidden rounded-full bg-[#0A0C0E] ring-1 ring-black/60 ring-inset">
+        <div className="absolute inset-x-0 top-1/2 h-[5px] -translate-y-1/2 overflow-hidden rounded-full bg-[#12161B] ring-1 ring-black/60 ring-inset">
           <div
             className="h-full rounded-full transition-[width] duration-100"
             style={{ width: `${pct}%`, background: accent, boxShadow: `0 0 8px ${accent}66` }}
@@ -371,8 +371,8 @@ export function Knob({
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           <defs>
             <radialGradient id={`kg-${label.replace(/\W/g, "")}`} cx="50%" cy="30%">
-              <stop offset="0%" stopColor="#2C3138" />
-              <stop offset="100%" stopColor="#14171B" />
+              <stop offset="0%" stopColor="#384049" />
+              <stop offset="100%" stopColor="#1E232B" />
             </radialGradient>
           </defs>
           {/* etched tick marks */}
@@ -388,14 +388,14 @@ export function Knob({
                 y1={r + inner * Math.sin(rad)}
                 x2={r + outer * Math.cos(rad)}
                 y2={r + outer * Math.sin(rad)}
-                stroke="#3A4048"
+                stroke="#4C5563"
                 strokeWidth={1}
               />
             );
           })}
-          <path d={arc(startAngle, startAngle + sweep)} stroke="#23272E" strokeWidth={3} fill="none" strokeLinecap="round" />
+          <path d={arc(startAngle, startAngle + sweep)} stroke="#333B46" strokeWidth={3} fill="none" strokeLinecap="round" />
           <path d={arc(startAngle, Math.max(angle, startAngle + 0.01))} stroke={accent} strokeWidth={3} fill="none" strokeLinecap="round" opacity={active ? 1 : 0.85} />
-          <circle cx={r} cy={r} r={r - 9} fill={`url(#kg-${label.replace(/\W/g, "")})`} stroke="#0B0D10" strokeWidth={1} />
+          <circle cx={r} cy={r} r={r - 9} fill={`url(#kg-${label.replace(/\W/g, "")})`} stroke="#161A20" strokeWidth={1} />
           <line
             x1={r + (r - 20) * Math.cos(((angle - 90) * Math.PI) / 180)}
             y1={r + (r - 20) * Math.sin(((angle - 90) * Math.PI) / 180)}

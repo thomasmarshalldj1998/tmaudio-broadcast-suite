@@ -112,9 +112,9 @@ export default function Dashboard() {
 
   return (
     <ConsoleContext.Provider value={ctx}>
-      <div className="min-h-screen bg-[#0B0C0E] text-foreground">
+      <div className="min-h-screen bg-[#181C22] text-foreground">
         {/* ---------------- rack header ---------------- */}
-        <header className="sticky top-0 z-40 border-b border-border/70 bg-[#0B0C0E]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0B0C0E]/85">
+        <header className="sticky top-0 z-40 border-b border-border/70 bg-[#181C22]/95 backdrop-blur supports-[backdrop-filter]:bg-[#181C22]/85">
           <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-6">
             <Link to="/" className="group flex items-center gap-3">
               <img
@@ -142,7 +142,7 @@ export default function Dashboard() {
                   "flex items-center gap-2 rounded-lg border px-3 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase transition-all",
                   running
                     ? "border-[#F5A524]/50 bg-[#F5A524]/12 text-[#F5A524] hover:bg-[#F5A524]/20"
-                    : "border-border/70 bg-[#14171C] text-muted-foreground hover:text-foreground",
+                    : "border-border/70 bg-[#2A313A] text-muted-foreground hover:text-foreground",
                 )}
               >
                 {running ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
@@ -248,7 +248,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="border-t border-border/50 bg-[#0E1014]">
+          <div className="border-t border-border/50 bg-[#1E232A]">
             <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-x-6 gap-y-1.5 px-4 py-2 sm:px-6">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
                 <span className="font-mono text-[10px] tracking-wider text-[#F5A524]">
