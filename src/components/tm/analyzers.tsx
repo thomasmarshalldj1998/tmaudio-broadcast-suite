@@ -27,10 +27,13 @@ export function truePeak(t: number, ceiling: number): number {
   return Math.min(p, ceiling + 0.35);
 }
 
-/** Measure how long a canvas-sized box takes to draw, used for the CPU badge. */
+/** Measure how long a canvas-sized box takes to draw, used for the CPU badge.
+ *  A non-positive interval disables the timer entirely — callers pass 0 while
+ *  the engine is in STANDBY so nothing ticks in the background. */
 export function useTick(ms: number): number {
   const [n, setN] = useState(0);
   useEffect(() => {
+    if (ms <= 0) return;
     const id = window.setInterval(() => setN((v) => v + 1), ms);
     return () => window.clearInterval(id);
   }, [ms]);

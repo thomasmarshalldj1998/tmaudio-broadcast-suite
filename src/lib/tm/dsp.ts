@@ -91,8 +91,12 @@ export const dbToAmp = (db: number) => Math.pow(10, db / 20);
 export const ampToDb = (a: number) => 20 * Math.log10(Math.max(a, 1e-9));
 
 /** Format a number with a fixed count of decimals, always the same width so
- *  tabular readouts never jitter. */
+ *  tabular readouts never jitter. Non-finite values render as "-inf" / "inf"
+ *  so a stopped engine can show true silence (-∞ dBFS) instead of
+ *  "-Infinity" or a stale floor value. */
 export function fixed(v: number, digits = 1): string {
+  if (v === Number.NEGATIVE_INFINITY) return "-inf";
+  if (v === Number.POSITIVE_INFINITY) return "inf";
   const s = v.toFixed(digits);
   return s === `-${(0).toFixed(digits)}` ? (0).toFixed(digits) : s;
 }
