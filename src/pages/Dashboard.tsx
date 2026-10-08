@@ -6,8 +6,8 @@ import { Led, Readout, Segmented } from "@/components/tm/ui";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import { LogOut, Pause, Play, RotateCcw } from "lucide-react";
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { LogOut, Pause, Play, RotateCcw, Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
 import { ConsoleContext, useConsole, type ConsoleCtx } from "./console/context";
 import { MasterProvider, useMaster } from "./console/master";
@@ -32,6 +32,7 @@ import { OutputChainsSection } from "./console/OutputChains";
 import { ReferenceSection } from "./console/Reference";
 import { RdsSection } from "./console/RdsSection";
 import { StandaloneSection } from "./console/StandaloneSection";
+import { ConsoleNav, MobileJumpBar, SettingsPalette } from "./console/Navigator";
 import logo from "@/assets/logo.svg";
 
 const PRESET_TABS: { value: PresetKey; label: string }[] = [
@@ -70,7 +71,7 @@ function Group({ label, children }: { label: string; children: ReactNode }) {
 
 /** Signal-flow strip + large live readouts: the processor overview. */
 export function Overview({ dirty }: { dirty: boolean }) {
-  const { cfg, running, presetKey, presetLabel, presetNote } = useConsole();
+  const { cfg, running, setRunning, presetKey, presetLabel, presetNote } = useConsole();
   const { tel, dspBypass, audioBypass, engineer } = useMaster();
   const preset = getPreset(presetKey);
 
@@ -142,7 +143,7 @@ export function Overview({ dirty }: { dirty: boolean }) {
 
   return (
     <section className="border-b border-border/60 bg-[#1E232A]/70">
-      <div className="mx-auto max-w-[1500px] px-4 py-4 sm:px-6">
+      <div className="mx-auto max-w-[1720px] px-4 py-4 sm:px-6">
         {/* signal flow */}
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2">
           <span className="mr-2 text-[9px] tracking-[0.22em] text-muted-foreground uppercase">
@@ -179,6 +180,29 @@ export function Overview({ dirty }: { dirty: boolean }) {
             </span>
           ))}
         </div>
+
+        {/* clean instance: nothing processes until the engine is started */}
+        {!running && (
+          <div className="mt-4 flex flex-wrap items-center gap-4 rounded-lg border border-[#F5A524]/40 bg-[#F5A524]/10 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold tracking-[0.18em] text-[#F5A524] uppercase">
+                Engine idle — clean instance
+              </p>
+              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                Nothing is being processed until you start it: meters rest at their
+                floor, counters stay at zero and no stage reports activity.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRunning(true)}
+              className="flex items-center gap-2 rounded-lg border border-[#F5A524]/60 bg-[#F5A524] px-4 py-2.5 text-[12px] font-semibold tracking-[0.16em] text-[#141005] uppercase transition-colors hover:bg-[#FFB84A]"
+            >
+              <Play className="size-4" />
+              Start engine
+            </button>
+          </div>
+        )}
 
         {/* large live values */}
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
@@ -267,6 +291,18 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
   const navigate = useNavigate();
   const { cfg, running, setRunning, presetKey, loadPreset } = useConsole();
   const { engineer, setEngineer, tel } = useMaster();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -276,8 +312,7 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
   return (
     <div className="min-h-screen bg-[#181C22] text-foreground">
       {/* ---------------- rack header ---------------- */}
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-[#181C22]/95 backdrop-blur supports-[backdrop-filter]:bg-[#181C22]/85">
-        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-[#181C22]/95 backdrop-blur supports-[backdrop-filter]:bg-[#181C22]/85">          <div className="mx-auto flex max-w-[1720px] flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
           <Link to="/" className="group flex items-center gap-3">
             <img
               src={logo}
@@ -308,7 +343,7 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
               )}
             >
               {running ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
-              {running ? "Running" : "Paused"}
+              {running ? "Running" : "Start"}
             </button>
             <Button
               size="sm"
@@ -320,6 +355,18 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
               <RotateCcw className="size-3.5" />
               Reset
             </Button>
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="flex items-center gap-2 rounded-lg border border-border/70 bg-[#2A313A] px-3 py-2 text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase transition-all hover:text-foreground"
+              title="Find any setting (⌘K / Ctrl+K)"
+            >
+              <Search className="size-3.5" />
+              Find settings
+              <span className="hidden font-mono text-[9px] tracking-normal opacity-70 sm:inline">
+                ⌘K
+              </span>
+            </button>
             <button
               type="button"
               onClick={() => setEngineer(!engineer)}
@@ -387,7 +434,10 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
       <Overview dirty={dirty} />
 
       {/* ---------------- rack units ---------------- */}
-      <main className="mx-auto flex max-w-[1500px] flex-col gap-7 px-4 py-5 sm:px-6 sm:py-6">
+      <main className="mx-auto flex w-full max-w-[1720px] gap-6 px-4 py-5 sm:px-6 sm:py-6">
+        <ConsoleNav />
+        <div className="flex min-w-0 flex-1 flex-col gap-7">
+          <MobileJumpBar />
         <Group label="Master">
           <MasterSection />
         </Group>
@@ -432,7 +482,10 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
             FM · DAB+ · WEB · HD — four independent chains, one clock
           </span>
         </footer>
+        </div>
       </main>
+
+      <SettingsPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );
 }
@@ -450,7 +503,7 @@ export default function Dashboard() {
   const [presetKey, setPresetKey] = useState<PresetKey>("fm");
   const [presetLabel, setPresetLabel] = useState<string>(getPreset("fm").name);
   const [presetNote, setPresetNote] = useState<string>(getPreset("fm").note);
-  const [running, setRunning] = useState(true);
+  const [running, setRunning] = useState(false);
   const [dirty, setDirty] = useState(false);
   const lastLog = useRef(0);
 

@@ -63,6 +63,7 @@ function Meters({
   color: string;
   extra?: string;
 }) {
+  const { running } = useConsole();
   useTick(90);
   const t = performance.now() / 1000;
   return (
@@ -75,7 +76,7 @@ function Meters({
       </div>
       <LevelMeter
         label="Integrated loudness"
-        value={loudness(t, target)}
+        value={running ? loudness(t, target) : -60}
         min={-40}
         max={-4}
         unit="LUFS"
@@ -83,7 +84,7 @@ function Meters({
       />
       <LevelMeter
         label="True peak"
-        value={truePeak(t, ceiling)}
+        value={running ? truePeak(t, ceiling) : -70}
         min={-12}
         max={2}
         ceiling={ceiling}
@@ -92,7 +93,7 @@ function Meters({
       />
       <LevelMeter
         label="Programme (LR)"
-        value={programLevel(t)}
+        value={running ? programLevel(t) : -60}
         min={-46}
         max={2}
         ceiling={0}

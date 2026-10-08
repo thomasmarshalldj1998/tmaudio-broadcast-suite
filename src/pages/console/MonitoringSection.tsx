@@ -3,12 +3,14 @@ import { LevelMeter, programLevel } from "@/components/tm/analyzers";
 import { slotGain } from "@/lib/tm/master";
 import { clamp, fixed } from "@/lib/tm/dsp";
 import { ChipButton } from "./MasterSection";
+import { useConsole } from "./context";
 import { useMaster, type MonitorSource } from "./master";
 
 /** Unit 10 — monitor path. Every control here writes only to monitor
  *  state; the broadcast chain (output engine → stream) never reads it. */
 export function MonitoringSection() {
   const { tel, monitor, setMonitor, slots } = useMaster();
+  const { running } = useConsole();
 
   const base =
     monitor.source === "input"
@@ -22,7 +24,9 @@ export function MonitoringSection() {
   const trim = monitor.match ? slotGain(otherCfg) - slotGain(activeCfg) : 0;
 
   // Mono sums both channels of the program model, then carries the chain delta.
-  const stereo = (programLevel(tel.t, 0) + programLevel(tel.t, 1)) / 2;
+  const stereo = running
+    ? (programLevel(tel.t, 0) + programLevel(tel.t, 1)) / 2
+    : -60;
   const monoLevel = stereo + (base - tel.inputDb);
   const source = monitor.mono ? monoLevel : base;
 

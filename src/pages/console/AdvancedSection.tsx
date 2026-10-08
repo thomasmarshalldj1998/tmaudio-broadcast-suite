@@ -122,7 +122,7 @@ export function AdvancedSection({
   useTick(120);
   const t = performance.now() / 1000;
 
-  const level = programLevel(t);
+  const level = running ? programLevel(t) : -80;
   const modulation = clamp(Math.pow(10, level / 20) * 100, 0, 100);
   const rows = complianceRows(target, ceiling);
   const recent = rows.slice(-6).reverse();
@@ -151,11 +151,11 @@ export function AdvancedSection({
         <div className="flex items-center gap-4">
           <Readout value={fixed(modulation, 1)} unit="% mod" tone="accent" />
           <Readout
-            value={fixed(loudness(t, target), 1)}
+            value={fixed(running ? loudness(t, target) : target - 60, 1)}
             unit="LUFS-I"
             tone="green"
           />
-          <Readout value={fixed(truePeak(t, ceiling), 1)} unit="dBTP" />
+          <Readout value={fixed(running ? truePeak(t, ceiling) : -70, 1)} unit="dBTP" />
         </div>
       }
     >
