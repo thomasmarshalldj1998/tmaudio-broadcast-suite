@@ -269,6 +269,43 @@ export function Fader({
   );
 }
 
+/** Compact gain-reduction meter with a peak-hold marker. Used by the MB3
+ *  overview and the processing-activity panel so both read identically. */
+export function GrBar({
+  value,
+  peak,
+  max = 14,
+  color = "#F5A524",
+  width = "w-full",
+}: {
+  value: number;
+  peak?: number;
+  max?: number;
+  color?: string;
+  width?: string;
+}) {
+  const pct = clamp(value / max, 0, 1) * 100;
+  const pk = clamp(peak ?? value, 0, max) / max * 100;
+  return (
+    <div
+      className={`relative h-2 overflow-hidden rounded-full bg-[#12161B] ring-1 ring-black/70 ring-inset ${width}`}
+    >
+      <div
+        className="h-full rounded-full transition-[width] duration-100"
+        style={{
+          width: `${pct}%`,
+          background: color,
+          boxShadow: `0 0 8px ${color}55`,
+        }}
+      />
+      <div
+        className="absolute top-0 h-full w-[2px] bg-white/70"
+        style={{ left: `calc(${pk}% - 1px)` }}
+      />
+    </div>
+  );
+}
+
 /** Rotary control: drag vertically, scroll, arrow keys, double-click reset. */
 export function Knob({
   label,

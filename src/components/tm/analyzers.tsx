@@ -130,11 +130,15 @@ export function SpectrumAnalyzer({
   accent = "#F5A524",
   gainDb = 0,
   bars = 56,
+  bandGains,
 }: {
   running: boolean;
   accent?: string;
   gainDb?: number;
   bars?: number;
+  /** Per-band gain in dB, derived from the live Sensus config. Applied to
+   *  the POST-DSP analyser so pre- and post-DSP really differ. */
+  bandGains?: number[];
 }) {
   const peaks = useRef<number[]>([]);
   const ref = useCanvas((ctx, w, h, t) => {
@@ -160,6 +164,11 @@ export function SpectrumAnalyzer({
           Math.sin(t * 2.1 + i * 0.31) * 0.06;
         mag += Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 * 1.9)), 8) * (i < bars * 0.16 ? 0.45 : 0);
         mag += gainDb / 60;
+        if (bandGains) {
+          const freq = 20 * Math.pow(1000, f);
+          const idx = BANDS.findIndex((b) => freq >= b.low && freq < b.high);
+          if (idx >= 0) mag += (bandGains[idx] ?? 0) / 60;
+        }
       } else {
         mag = -0.9;
       }
@@ -375,6 +384,24 @@ export function MpxAnalyzer({
  * Sensus per-band gain reduction
  * ------------------------------------------------------------------ */
 
+/** Per-band gain reduction of the Sensus timing law — the single source
+ *  of truth shared by the BandActivity canvas and the MB3 / activity
+ *  readouts, so the drawn bars and the DOM numbers always agree. */
+export function bandGainReduction(
+  i: number,
+  t: number,
+  mode: string,
+  thresholds: number[],
+): number {
+  const speed = mode === "transient" ? 7.5 : mode === "speech" ? 2.1 : 3.6;
+  const bias = (thresholds[i] + 24) / 24;
+  const drive =
+    Math.pow(Math.max(0, Math.sin(t * speed + i * 0.9)), 3) * 0.75 +
+    (Math.sin(t * 1.3 + i * 2.1) * 0.5 + 0.5) * 0.35 +
+    Math.sin(t * 17 + i) * 0.05;
+  return clamp(drive * (0.5 + bias * 0.9) * 14, 0, 14);
+}
+
 export function BandActivity({
   running,
   mode,
@@ -398,16 +425,7 @@ export function BandActivity({
 
     for (let i = 0; i < 6; i++) {
       const band = BANDS[i];
-      const speed = mode === "transient" ? 7.5 : mode === "speech" ? 2.1 : 3.6;
-      const bias = (thresholds[i] + 24) / 24;
-      let gr = 0;
-      if (running) {
-        const drive =
-          Math.pow(Math.max(0, Math.sin(t * speed + i * 0.9)), 3) * 0.75 +
-          (Math.sin(t * 1.3 + i * 2.1) * 0.5 + 0.5) * 0.35 +
-          Math.sin(t * 17 + i) * 0.05;
-        gr = clamp(drive * (0.5 + bias * 0.9) * 14, 0, 14);
-      }
+      const gr = running ? bandGainReduction(i, t, mode, thresholds) : 0;
       const x0 = i * colW;
       const barH = (gr / 14) * span;
 

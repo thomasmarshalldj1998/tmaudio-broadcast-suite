@@ -6,6 +6,7 @@ import {
 } from "@/components/tm/analyzers";
 import {
   Fader,
+  GrBar,
   Knob,
   Led,
   Legend,
@@ -15,6 +16,7 @@ import {
 } from "@/components/tm/ui";
 import { Switch } from "@/components/ui/switch";
 import { useConsole } from "./context";
+import { useMaster } from "./master";
 
 function Toggle({
   label,
@@ -52,7 +54,7 @@ export function InputSection() {
 
   return (
     <RackUnit
-      index="01"
+      index="02"
       title="Input Stage"
       eyebrow="96 kHz native · 32-bit float · dual-speed AGC"
       accent={PATH_COLORS.fm}
@@ -247,11 +249,12 @@ export function InputSection() {
 
 export function SensusSection() {
   const { cfg, set, setBand, running } = useConsole();
+  const { engineer, tel } = useMaster();
   const s = cfg.sensus;
 
   return (
     <RackUnit
-      index="02"
+      index="03"
       title="TMAUDIO Sensus — Multiband Dynamics"
       eyebrow="6-band linear-phase crossover · density-adaptive timing"
       accent={PATH_COLORS.fm}
@@ -264,8 +267,81 @@ export function SensusSection() {
         </div>
       }
     >
+      {/* ---------------- MB3 overview ---------------- */}
+      <div className="mb-5 flex flex-col gap-3 rounded-lg border border-border/60 bg-[#1E232A] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Legend>MB3 overview — three-way summary of the six Sensus bands</Legend>
+          <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+            current / peak gain reduction
+          </span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {([
+            ["LOW", tel.mb3.low, "#D97706", "bands 1–2 · below 300 Hz"],
+            ["MID", tel.mb3.mid, "#F5A524", "bands 3–4 · 300 Hz – 3.5 kHz"],
+            ["HIGH", tel.mb3.high, "#FDE68A", "bands 5–6 · above 3.5 kHz"],
+          ] as const).map(([label, stat, color, note]) => (
+            <div
+              key={label}
+              className="flex flex-col gap-2 rounded-lg border border-border/60 bg-[#12161B] p-3"
+            >
+              <div className="flex items-baseline justify-between">
+                <span
+                  className="text-[10px] font-semibold tracking-[0.18em] uppercase"
+                  style={{ color }}
+                >
+                  {label}
+                </span>
+                <span
+                  className="font-mono text-[13px] tabular-nums"
+                  style={{
+                    color: stat.now > 0.05 ? color : "rgba(255,255,255,0.55)",
+                  }}
+                >
+                  {stat.now > 0.005 ? `−${fixed(stat.now, 1)}` : "0.0"}
+                  <span className="ml-0.5 text-[9px] text-muted-foreground">dB</span>
+                </span>
+              </div>
+              <GrBar value={stat.now} peak={stat.peak} max={14} color={color} />
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>{note}</span>
+                <span className="font-mono tabular-nums">
+                  peak −{fixed(stat.peak, 1)} dB
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-5 border-t border-border/50 pt-3">
+          <Legend>MB3 activity</Legend>
+          {([
+            ["LOW", tel.mb3.low, "#D97706"],
+            ["MID", tel.mb3.mid, "#F5A524"],
+            ["HIGH", tel.mb3.high, "#FDE68A"],
+          ] as const).map(([label, stat, color]) => (
+            <span key={label} className="flex items-center gap-2">
+              <span
+                className="size-2.5 rounded-full transition-all"
+                style={{
+                  background: running && stat.now > 0.05 ? color : "#6B7280",
+                  boxShadow:
+                    running && stat.now > 0.05 ? `0 0 8px ${color}99` : "none",
+                }}
+              />
+              <span className="text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
+                {label}
+              </span>
+              <span className="font-mono text-[10px] tabular-nums text-foreground/80">
+                {stat.now > 0.005 ? `−${fixed(stat.now, 1)}` : "0.0"} dB
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
+
       <div className="grid gap-5 xl:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-5">
+          {engineer && (
           <div className="grid gap-4 md:grid-cols-4">
             <div className="flex flex-col gap-2">
               <Legend>Timing source</Legend>
@@ -319,6 +395,7 @@ export function SensusSection() {
               />
             </div>
           </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
             {BANDS.map((band, idx) => {
@@ -343,7 +420,9 @@ export function SensusSection() {
                   <span className="font-mono text-[9px] text-muted-foreground/80">
                     {band.range}
                   </span>
-                  <div className="grid grid-cols-3 gap-x-1 gap-y-2 justify-items-center">
+                  <div
+                    className={`grid gap-x-1 gap-y-2 justify-items-center ${engineer ? "grid-cols-3" : "grid-cols-1"}`}
+                  >
                     <Knob
                       label="Thr"
                       value={b.threshold}
@@ -356,6 +435,8 @@ export function SensusSection() {
                       accent={band.color}
                       onChange={(v) => setBand(idx, { threshold: v })}
                     />
+                    {engineer && (
+                      <>
                     <Knob
                       label="Ratio"
                       value={b.ratio}
@@ -404,6 +485,8 @@ export function SensusSection() {
                       accent={band.color}
                       onChange={(v) => setBand(idx, { release: v })}
                     />
+                      </>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <Fader
@@ -474,7 +557,7 @@ export function ImagingSection() {
 
   return (
     <RackUnit
-      index="03"
+      index="04"
       title="Imaging & Mid-Side"
       eyebrow="per-band width · Haas decorrelation · mono-compatible"
       accent={PATH_COLORS.dab}

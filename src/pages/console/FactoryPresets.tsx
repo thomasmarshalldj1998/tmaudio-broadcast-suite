@@ -102,7 +102,7 @@ export function FactoryPresetsSection() {
 
   return (
     <RackUnit
-      index="07"
+      index="14"
       title="Factory Preset Library"
       eyebrow="31 broadcast voicings · plain-text decimal · no obfuscation"
       accent={PATH_COLORS.hd}

@@ -7,7 +7,6 @@ export type ConsoleCtx = {
   presetKey: PresetKey;
   presetLabel: string;
   presetNote: string;
-  cpu: number;
   setRunning: (v: boolean) => void;
   set: <K extends keyof ProcessorConfig>(
     key: K,

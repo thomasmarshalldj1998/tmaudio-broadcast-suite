@@ -122,7 +122,7 @@ export function OutputChainsSection() {
 
   return (
     <RackUnit
-      index="04"
+      index="06"
       title="Parallel Output Chains"
       eyebrow="four independent signal paths · no shared processing"
       accent={color}
