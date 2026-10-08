@@ -94,7 +94,7 @@ export function RdsSection() {
 
   return (
     <RackUnit
-      index="07"
+      index="08"
       title="RDS Encoder"
       eyebrow="EN 50067 · CRC-10 + offset words · phase-locked to pilot"
       accent={PATH_COLORS.dab}

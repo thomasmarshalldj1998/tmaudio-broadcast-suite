@@ -248,7 +248,7 @@ export function ReferenceSection() {
 
   return (
     <RackUnit
-      index="17"
+      index="18"
       title="Presets, Architecture & Compliance"
       eyebrow="deliverables · plain-text configs · open source tree"
       accent={PATH_COLORS.web}

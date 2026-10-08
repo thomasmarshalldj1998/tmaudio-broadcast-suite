@@ -4,7 +4,7 @@ import { fixed } from "@/lib/tm/dsp";
 import { useConsole } from "./context";
 import { useMaster } from "./master";
 
-/** Unit 09 — the same analyser drawn twice: once on the raw program and
+/** Unit 10 — the same analyser drawn twice: once on the raw program and
  *  once after the live band gains and chain gain are applied. Both traces
  *  come from the same program model, so nothing here is invented. */
 export function AnalysisSection() {
@@ -16,7 +16,7 @@ export function AnalysisSection() {
 
   return (
     <RackUnit
-      index="09"
+      index="10"
       title="Analysis — Input & Output Spectrum"
       eyebrow="pre-DSP vs post-DSP · one program model, two tap points"
       accent="#35C8D8"

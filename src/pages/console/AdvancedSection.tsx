@@ -143,7 +143,7 @@ export function AdvancedSection({
 
   return (
     <RackUnit
-      index="15"
+      index="16"
       title="Station Features, Monitoring & Compliance"
       eyebrow="fallback · patch bay · loudness history · 24 h log"
       accent="#4ADE80"

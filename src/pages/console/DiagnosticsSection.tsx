@@ -22,7 +22,7 @@ const STATUS_LABEL: Record<Status, string> = {
 };
 
 /* ================================================================== *
- * Unit 11 — audio path
+ * Unit 12 — audio path
  * ================================================================== */
 
 export function AudioPathSection() {
@@ -93,7 +93,7 @@ export function AudioPathSection() {
 
   return (
     <RackUnit
-      index="11"
+      index="12"
       title="Audio Path"
       eyebrow="live routing with stage health · input → stream"
       accent="#4ADE80"
@@ -178,7 +178,7 @@ export function AudioPathSection() {
 }
 
 /* ================================================================== *
- * Unit 12 — safety counters
+ * Unit 13 — safety counters
  * ================================================================== */
 
 export function SafetySection() {
@@ -213,7 +213,7 @@ export function SafetySection() {
 
   return (
     <RackUnit
-      index="12"
+      index="13"
       title="Safety Counters"
       eyebrow="measured events in the selected window — never simulated"
       accent="#F5A524"
@@ -264,7 +264,7 @@ export function SafetySection() {
 }
 
 /* ================================================================== *
- * Unit 13 — event log
+ * Unit 14 — event log
  * ================================================================== */
 
 const CATS: ("ALL" | LogCategory)[] = [
@@ -284,7 +284,7 @@ export function EventLogSection() {
 
   return (
     <RackUnit
-      index="13"
+      index="14"
       title="Event Log"
       eyebrow="timestamped real events — operator actions and telemetry transitions"
       accent="#35C8D8"

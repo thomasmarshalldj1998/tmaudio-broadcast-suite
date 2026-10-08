@@ -40,7 +40,7 @@ function Stat({
   );
 }
 
-/** Unit 08 — professional loudness console: BS.1770 momentary / short-term /
+/** Unit 09 — professional loudness console: BS.1770 momentary / short-term /
  *  integrated, LRA, true peak with a SAFE-WARNING-ERROR state, and a
  *  configurable target with live offset. */
 export function LoudnessSection() {
@@ -57,7 +57,7 @@ export function LoudnessSection() {
 
   return (
     <RackUnit
-      index="08"
+      index="09"
       title="Loudness & True Peak"
       eyebrow="ITU-R BS.1770 · EBU R128 gated measurement"
       accent="#4ADE80"

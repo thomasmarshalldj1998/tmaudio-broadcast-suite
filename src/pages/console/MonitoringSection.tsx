@@ -6,7 +6,7 @@ import { ChipButton } from "./MasterSection";
 import { useConsole } from "./context";
 import { useMaster, type MonitorSource } from "./master";
 
-/** Unit 10 — monitor path. Every control here writes only to monitor
+/** Unit 11 — monitor path. Every control here writes only to monitor
  *  state; the broadcast chain (output engine → stream) never reads it. */
 export function MonitoringSection() {
   const { tel, monitor, setMonitor, slots } = useMaster();
@@ -36,7 +36,7 @@ export function MonitoringSection() {
 
   return (
     <RackUnit
-      index="10"
+      index="11"
       title="Monitoring"
       eyebrow="monitor path only — broadcast output is never altered"
       accent="#35C8D8"

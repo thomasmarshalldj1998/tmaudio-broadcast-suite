@@ -6,7 +6,7 @@ import { Led, Readout, Segmented } from "@/components/tm/ui";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import { LogOut, Pause, Play, RotateCcw, Search } from "lucide-react";
+import { LogOut, Pause, Play, Power, RotateCcw, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
 import { ConsoleContext, useConsole, type ConsoleCtx } from "./console/context";
@@ -29,6 +29,7 @@ import {
 import { AdvancedSection } from "./console/AdvancedSection";
 import { FactoryPresetsSection } from "./console/FactoryPresets";
 import { OutputChainsSection } from "./console/OutputChains";
+import { StreamTxSection } from "./console/StreamTx";
 import { ReferenceSection } from "./console/Reference";
 import { RdsSection } from "./console/RdsSection";
 import { StandaloneSection } from "./console/StandaloneSection";
@@ -181,28 +182,70 @@ export function Overview({ dirty }: { dirty: boolean }) {
           ))}
         </div>
 
-        {/* clean instance: nothing processes until the engine is started */}
-        {!running && (
-          <div className="mt-4 flex flex-wrap items-center gap-4 rounded-lg border border-[#F5A524]/40 bg-[#F5A524]/10 px-4 py-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold tracking-[0.18em] text-[#F5A524] uppercase">
-                Engine idle — clean instance
-              </p>
-              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                Nothing is being processed until you start it: meters rest at their
-                floor, counters stay at zero and no stage reports activity.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setRunning(true)}
-              className="flex items-center gap-2 rounded-lg border border-[#F5A524]/60 bg-[#F5A524] px-4 py-2.5 text-[12px] font-semibold tracking-[0.16em] text-[#141005] uppercase transition-colors hover:bg-[#FFB84A]"
+        {/* master hardware power — the single switch that starts the engine */}
+        <div
+          className={cn(
+            "mt-4 flex flex-wrap items-center gap-5 rounded-lg border px-4 py-3.5",
+            running
+              ? "border-[#4ADE80]/40 bg-[#4ADE80]/[0.07]"
+              : "border-[#F5A524]/40 bg-[#F5A524]/10",
+          )}
+        >
+          <button
+            type="button"
+            onClick={() => setRunning(!running)}
+            aria-pressed={running}
+            aria-label={running ? "Stop audio engine" : "Start audio engine"}
+            className="group relative grid size-16 shrink-0 place-items-center rounded-full border-2 transition-all duration-200 active:scale-95"
+            style={{
+              borderColor: running ? COLOR.green : COLOR.amber,
+              background:
+                "radial-gradient(circle at 50% 34%, #2E343C 0%, #171B21 72%)",
+              boxShadow: running
+                ? `0 0 22px ${COLOR.green}55, inset 0 0 14px ${COLOR.green}33`
+                : `inset 0 3px 8px rgba(0,0,0,0.75), 0 0 14px ${COLOR.amber}33`,
+            }}
+          >
+            <Power
+              className={cn(
+                "size-7 transition-colors",
+                running
+                  ? "text-[#4ADE80] drop-shadow-[0_0_6px_rgba(74,222,128,0.8)]"
+                  : "text-[#F5A524] drop-shadow-[0_0_5px_rgba(245,165,36,0.55)] group-hover:text-[#FFB84A]",
+              )}
+            />
+          </button>
+
+          <div className="min-w-0 flex-1">
+            <p
+              className="text-[11px] font-semibold tracking-[0.18em] uppercase"
+              style={{ color: running ? COLOR.green : COLOR.amber }}
             >
-              <Play className="size-4" />
-              Start engine
-            </button>
+              {running ? "Running — engine live" : "Standby — engine stopped"}
+            </p>
+            <p className="mt-1 max-w-[64ch] text-[11px] leading-relaxed text-muted-foreground">
+              {running
+                ? "DSP, meters, loudness analysis and every armed Stream TX slot are processing. Press STOP to drop the whole rack back to its floor."
+                : "Clean instance: nothing processes until you press RUN — input and loudness read -inf dBFS / 0.0, counters stay at zero, TX slots report 0 kbps and no loop runs in the background."}
+            </p>
           </div>
-        )}
+
+          <div className="flex flex-col items-end gap-1.5">
+            <span
+              className="rounded-md border px-3 py-1.5 text-[11px] font-bold tracking-[0.2em] uppercase"
+              style={{
+                borderColor: running ? `${COLOR.green}66` : `${COLOR.amber}66`,
+                color: running ? COLOR.green : COLOR.amber,
+                background: running ? `${COLOR.green}14` : `${COLOR.amber}14`,
+              }}
+            >
+              {running ? "Running" : "Standby / Stopped"}
+            </span>
+            <span className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+              {running ? "press stop to halt" : "press run to start"}
+            </span>
+          </div>
+        </div>
 
         {/* large live values */}
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
@@ -343,7 +386,7 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
               )}
             >
               {running ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
-              {running ? "Running" : "Start"}
+              {running ? "Stop" : "Start"}
             </button>
             <Button
               size="sm"
@@ -448,6 +491,7 @@ function ConsoleShell({ dirty, target, ceiling }: { dirty: boolean; target: numb
           <ImagingSection />
           <ActivitySection />
           <OutputChainsSection />
+          <StreamTxSection />
           <RdsSection />
         </Group>
 
@@ -503,9 +547,22 @@ export default function Dashboard() {
   const [presetKey, setPresetKey] = useState<PresetKey>("fm");
   const [presetLabel, setPresetLabel] = useState<string>(getPreset("fm").name);
   const [presetNote, setPresetNote] = useState<string>(getPreset("fm").note);
-  const [running, setRunning] = useState(false);
+  const [running, setRunningState] = useState(false);
   const [dirty, setDirty] = useState(false);
   const lastLog = useRef(0);
+
+  /** The only way the engine starts or stops — logs the transition so the
+   *  event log shows exactly when the rack left standby. */
+  const setRunning = (v: boolean) => {
+    if (v === running) return;
+    setRunningState(v);
+    pushLog(
+      "AUDIO",
+      v
+        ? "Engine RUN — DSP, meters, loudness analysis and TX slots active"
+        : "Engine STOP — processing halted, all telemetry dropped to floor",
+    );
+  };
 
   const { target, ceiling } = chainTargets(cfg, presetKey);
 

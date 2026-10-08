@@ -202,7 +202,7 @@ export function StandaloneSection() {
 
   return (
     <RackUnit
-      index="16"
+      index="17"
       title="Standalone Edition — Build, Deploy & Documentation"
       eyebrow="single self-contained executable · no external runtime"
       accent={PATH_COLORS.web}

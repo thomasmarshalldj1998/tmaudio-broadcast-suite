@@ -100,6 +100,15 @@ export const SETTINGS: SettingEntry[] = [
     id: "unit-07",
     unit: "07",
     group: "Processing",
+    short: "Stream TX matrix",
+    title: "Stream TX encoder matrix — 8 slots, protocols & codecs",
+    keywords:
+      "stream tx encoder encode slot1 slot2 3 4 5 6 7 8 icy shoutcast icecast tcp udp srt socket ring buffer drop congestion bitrate opus aac mp3 publish mount host port network non-http direct",
+  },
+  {
+    id: "unit-08",
+    unit: "08",
+    group: "Processing",
     short: "RDS / DLS",
     title: "RDS / DLS encoder — PI, PS, RadioText, 57 kHz",
     keywords:
@@ -107,8 +116,8 @@ export const SETTINGS: SettingEntry[] = [
   },
 
   {
-    id: "unit-08",
-    unit: "08",
+    id: "unit-09",
+    unit: "09",
     group: "Analysis",
     short: "Loudness & true peak",
     title: "Loudness & true peak — target, offset, ceiling",
@@ -116,8 +125,8 @@ export const SETTINGS: SettingEntry[] = [
       "loudness lufs lra momentary short term integrated target offset ceiling true peak dbtp r128 bs.1770 compliance",
   },
   {
-    id: "unit-09",
-    unit: "09",
+    id: "unit-10",
+    unit: "10",
     group: "Analysis",
     short: "Spectrum analysis",
     title: "Spectrum analysis — pre-DSP vs post-DSP",
@@ -125,8 +134,8 @@ export const SETTINGS: SettingEntry[] = [
   },
 
   {
-    id: "unit-10",
-    unit: "10",
+    id: "unit-11",
+    unit: "11",
     group: "Monitoring",
     short: "Monitoring",
     title: "Monitoring — source, A/B, mono, dim, mute",
@@ -135,8 +144,8 @@ export const SETTINGS: SettingEntry[] = [
   },
 
   {
-    id: "unit-11",
-    unit: "11",
+    id: "unit-12",
+    unit: "12",
     group: "Diagnostics",
     short: "Audio path",
     title: "Audio path — routing, latency, buffer, health",
@@ -144,16 +153,16 @@ export const SETTINGS: SettingEntry[] = [
       "routing path latency buffer sample rate channels dropouts underruns health status input output stream",
   },
   {
-    id: "unit-12",
-    unit: "12",
+    id: "unit-13",
+    unit: "13",
     group: "Diagnostics",
     short: "Safety counters",
     title: "Safety counters — clip, limiter, dropout events",
     keywords: "safety counters clip events limiter events dropouts underruns window",
   },
   {
-    id: "unit-13",
-    unit: "13",
+    id: "unit-14",
+    unit: "14",
     group: "Diagnostics",
     short: "Event log",
     title: "Event log — INFO / AUDIO / DSP / ROUTING / WARNING / ERROR",
@@ -161,8 +170,8 @@ export const SETTINGS: SettingEntry[] = [
   },
 
   {
-    id: "unit-14",
-    unit: "14",
+    id: "unit-15",
+    unit: "15",
     group: "System",
     short: "Factory presets",
     title: "Factory preset library — .tm files, save & load",
@@ -170,8 +179,8 @@ export const SETTINGS: SettingEntry[] = [
       "preset factory save load import export tm library profile chr classical talk news balanced",
   },
   {
-    id: "unit-15",
-    unit: "15",
+    id: "unit-16",
+    unit: "16",
     group: "System",
     short: "Station features",
     title: "Station features — silence, fallback, AES67, compliance",
@@ -179,16 +188,16 @@ export const SETTINGS: SettingEntry[] = [
       "silence detect fallback source aes67 ravenna patch bay watermark compliance 24h log web remote dynamic eq phat bass crossfade",
   },
   {
-    id: "unit-16",
-    unit: "16",
+    id: "unit-17",
+    unit: "17",
     group: "System",
     short: "Build & deploy",
     title: "Standalone build & deploy — exe, AppImage, docs",
     keywords: "build deploy install package appimage windows linux macos docs standalone portable",
   },
   {
-    id: "unit-17",
-    unit: "17",
+    id: "unit-18",
+    unit: "18",
     group: "System",
     short: "Reference",
     title: "Reference — architecture, standards & comparison",
@@ -214,6 +223,9 @@ export function searchSettings(q: string): SettingEntry[] {
       if (!hay.includes(t)) return null;
       score += title.includes(t) ? 4 : e.keywords.includes(t) ? 2 : 1;
     }
+    // Exact-phrase title match wins outright: "stream tx encoder" must
+    // land on the TX matrix, not on a panel that merely mentions it.
+    if (title.includes(query)) score += 6;
     return { e, score };
   })
     .filter((x): x is { e: SettingEntry; score: number } => x !== null)
