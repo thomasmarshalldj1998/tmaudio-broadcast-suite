@@ -37,6 +37,33 @@ export function useTick(ms: number): number {
   return n;
 }
 
+/** Return `color` at alpha `a` (0–1).
+ *
+ * Appending a two-digit hex suffix ("#RRGGBB" + "22") only produces a valid
+ * colour for hex inputs — passing "rgba(…)22" to CanvasGradient.addColorStop()
+ * throws `SyntaxError: could not be parsed as a color`. rgb()/rgba()/hsl()
+ * inputs are therefore rebuilt with a scaled alpha instead. */
+export function fadeColor(color: string, a: number): string {
+  const alpha = Math.max(0, Math.min(1, a));
+  const fn = color.match(/^(rgba?)\(\s*([^)]+)\)$/i);
+  if (fn) {
+    const p = fn[2].split(/[\s,/]+/).filter(Boolean);
+    const base = p[3] === undefined ? 1 : parseFloat(p[3]);
+    const scaled = (Number.isFinite(base) ? base : 1) * alpha;
+    return `rgba(${p[0]}, ${p[1]}, ${p[2]}, ${Number.isFinite(scaled) ? scaled.toFixed(3) : "1"})`;
+  }
+  if (color.startsWith("#")) {
+    const hex =
+      color.length === 4
+        ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+        : color;
+    return `${hex}${Math.round(alpha * 255)
+      .toString(16)
+      .padStart(2, "0")}`;
+  }
+  return color; // named colours: no safe alpha variant, return unchanged
+}
+
 type Draw = (
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -182,7 +209,7 @@ export function SpectrumAnalyzer({
       const x = i * bw;
       const g = ctx.createLinearGradient(0, floor - bh, 0, floor);
       g.addColorStop(0, accent);
-      g.addColorStop(1, `${accent}55`);
+      g.addColorStop(1, fadeColor(accent, 0x55 / 255));
       ctx.fillStyle = g;
       ctx.fillRect(x + 1, floor - bh, bw - 2, bh);
 
@@ -272,7 +299,7 @@ export function MpxAnalyzer({
       ctx.closePath();
       const g = ctx.createLinearGradient(0, 0, 0, h);
       g.addColorStop(0, color);
-      g.addColorStop(1, `${color}22`);
+      g.addColorStop(1, fadeColor(color, 0x22 / 255));
       ctx.fillStyle = g;
       ctx.fill();
     };
@@ -435,7 +462,7 @@ export function BandActivity({
 
       const g = ctx.createLinearGradient(0, top, 0, top + span);
       g.addColorStop(0, band.color);
-      g.addColorStop(1, `${band.color}44`);
+      g.addColorStop(1, fadeColor(band.color, 0x44 / 255));
       ctx.fillStyle = g;
       ctx.fillRect(x0 + 7, top, colW - 14, Math.max(1.5, barH));
       if (barH > 1) {
@@ -772,9 +799,9 @@ export function CompositeWaveform({
       else ctx.lineTo(px, y);
     }
     const g = ctx.createLinearGradient(0, 0, w, 0);
-    g.addColorStop(0, `${accent}22`);
+    g.addColorStop(0, fadeColor(accent, 0x22 / 255));
     g.addColorStop(0.5, accent);
-    g.addColorStop(1, `${accent}22`);
+    g.addColorStop(1, fadeColor(accent, 0x22 / 255));
     ctx.strokeStyle = g;
     ctx.lineWidth = 1.4;
     ctx.stroke();
