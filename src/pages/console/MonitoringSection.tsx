@@ -27,12 +27,17 @@ export function MonitoringSection() {
   const stereo = running
     ? (programLevel(tel.t, 0) + programLevel(tel.t, 1)) / 2
     : -60;
-  const monoLevel = stereo + (base - tel.inputDb);
+  // In standby base and tel.inputDb are both -inf, so the delta would be
+  // NaN — the mono path reports true silence instead.
+  const monoLevel =
+    running && Number.isFinite(base) ? stereo + (base - tel.inputDb) : Number.NEGATIVE_INFINITY;
   const source = monitor.mono ? monoLevel : base;
 
   const monitorDb = monitor.mute
     ? -60
-    : clamp(source + (monitor.dim ? -20 : 0) + trim, -60, 0.5);
+    : Number.isFinite(source)
+      ? clamp(source + (monitor.dim ? -20 : 0) + trim, -60, 0.5)
+      : Number.NEGATIVE_INFINITY;
 
   return (
     <RackUnit

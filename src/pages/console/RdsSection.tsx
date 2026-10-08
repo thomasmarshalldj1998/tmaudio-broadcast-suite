@@ -50,7 +50,8 @@ function Flag({
 export function RdsSection() {
   const { cfg, set, running } = useConsole();
   const rds = cfg.rds;
-  const tick = useTick(1000);
+  // STANDBY: the RadioText queue stops rotating — no interval in the background.
+  const tick = useTick(running ? 1000 : 0);
 
   const [queue, setQueue] = useState<string[]>([
     rds.rt,

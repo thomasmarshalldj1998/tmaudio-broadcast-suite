@@ -134,7 +134,8 @@ export function useTelemetry(opts: {
   trimDb: number;
 }): Telemetry {
   const { cfg, running, target, ceiling, window, dry, trimDb } = opts;
-  useTick(100);
+  /* STANDBY: no timer at all — a stopped engine must not schedule work. */
+  useTick(running ? 100 : 0);
 
   const t = performance.now() / 1000;
   const track = useRef<Track>({
@@ -150,6 +151,52 @@ export function useTelemetry(opts: {
   });
   const st = track.current;
 
+  /* ---- STANDBY / STOPPED -------------------------------------------
+   * The engine is off: levels are true silence (-inf dBFS / -inf LUFS),
+   * every gain-reduction, modulation and counter value is exactly zero,
+   * and all history is dropped so STOP really does reset the rack. */
+  if (!running) {
+    st.samples = [];
+    st.clips = [];
+    st.limits = [];
+    st.lastT = 0;
+    st.prevClip = false;
+    st.prevLim = false;
+    st.dropouts = 0;
+    st.underruns = 0;
+    st.loopMs = 0;
+    return {
+      t,
+      inputDb: Number.NEGATIVE_INFINITY,
+      processedDb: Number.NEGATIVE_INFINITY,
+      outputDb: Number.NEGATIVE_INFINITY,
+      grDb: 0,
+      agcGr: 0,
+      mb3Gr: 0,
+      clipGr: 0,
+      limitGr: 0,
+      bandGr: cfg.sensus.bands.map(() => 0),
+      mb3: {
+        low: { now: 0, peak: 0 },
+        mid: { now: 0, peak: 0 },
+        high: { now: 0, peak: 0 },
+      },
+      momentary: Number.NEGATIVE_INFINITY,
+      shortTerm: Number.NEGATIVE_INFINITY,
+      integrated: Number.NEGATIVE_INFINITY,
+      lra: 0,
+      truePeakDb: Number.NEGATIVE_INFINITY,
+      tpStatus: "SAFE",
+      counters: { clip: 0, limiter: 0, dropout: 0, underrun: 0 },
+      latencyMs: (cfg.sensus.blockSize / ENGINE.sampleRate) * 1000 * 2,
+      sampleRate: ENGINE.sampleRate,
+      channels: ENGINE.channels,
+      bufferSmp: cfg.sensus.blockSize,
+      modPct: 0,
+      loopMs: 0,
+    };
+  }
+
   /* ---- delivery-loop health: real gap detection, never invented ---- */
   const visible = typeof document === "undefined" || document.visibilityState === "visible";
   if (st.lastT && visible) {
@@ -161,28 +208,28 @@ export function useTelemetry(opts: {
   st.lastT = t;
 
   /* ---- input stage -------------------------------------------------- */
-  const inputRaw = running ? programLevel(t, 0) : -60;
-  const peak = running ? peakModel(t) : -60;
+  const inputRaw = programLevel(t, 0);
+  const peak = peakModel(t);
 
   /* AGC: gain toward the measured program mean, bounded by the configured
      slow + fast range. Negative values are reduction (shown as GR). */
   const history = st.samples.filter((s) => t - s.t <= 60).map((s) => s.input);
   const ref = history.length ? mean(history) : inputRaw;
   const maxAgc = cfg.input.slowGain + cfg.input.fastGain;
-  const agcApplied = running ? clamp(ref - inputRaw, -maxAgc, maxAgc) : 0;
+  const agcApplied = clamp(ref - inputRaw, -maxAgc, maxAgc);
   const agcGr = Math.max(0, -agcApplied);
 
   /* Sensus band bank: identical formula to the BandActivity canvas. */
   const thresholds = cfg.sensus.bands.map((b) => b.threshold);
   const bandGr = cfg.sensus.bands.map((_, i) =>
-    running ? bandGainReduction(i, t, cfg.sensus.mode, thresholds) : 0,
+    bandGainReduction(i, t, cfg.sensus.mode, thresholds),
   );
   const mb3Gr = mean(bandGr);
 
   /* Clipper: program driven by cfg.fm.mainClip dB into a 0 dBFS clip point. */
-  const clipGr = running ? Math.max(0, peak + cfg.fm.mainClip) : 0;
+  const clipGr = Math.max(0, peak + cfg.fm.mainClip);
   /* Limiter / true-peak stage: removes whatever exceeds the ceiling. */
-  const limitGr = running ? Math.max(0, peak - ceiling) : 0;
+  const limitGr = Math.max(0, peak - ceiling);
 
   const makeup = makeupDb(cfg);
   const grDb = agcGr + mb3Gr + clipGr + limitGr;
@@ -198,13 +245,16 @@ export function useTelemetry(opts: {
   );
 
   /* ---- loudness ----------------------------------------------------- */
-  const baseLoudness = running ? loudness(t, target) : target - 60;
-  const momentary = clamp(baseLoudness + dry * (inputRaw - processedDb), -70, -3);
+  const momentary = clamp(
+    loudness(t, target) + dry * (inputRaw - processedDb),
+    -70,
+    -3,
+  );
 
   /* ---- true peak / status ------------------------------------------ */
-  const truePeakDb = running ? truePeak(t, ceiling) : -70;
+  const truePeakDb = truePeak(t, ceiling);
   const tpStatus: Telemetry["tpStatus"] =
-    !running || truePeakDb < ceiling
+    truePeakDb < ceiling
       ? "SAFE"
       : truePeakDb <= ceiling + 0.2
         ? "WARNING"

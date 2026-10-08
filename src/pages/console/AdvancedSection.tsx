@@ -119,10 +119,11 @@ export function AdvancedSection({
 }) {
   const { cfg, set, running } = useConsole();
   const x = cfg.extras;
-  useTick(120);
+  // STANDBY: no timer — and true silence (-inf) instead of a -80 dBFS floor.
+  useTick(running ? 120 : 0);
   const t = performance.now() / 1000;
 
-  const level = running ? programLevel(t) : -80;
+  const level = running ? programLevel(t) : Number.NEGATIVE_INFINITY;
   const modulation = clamp(Math.pow(10, level / 20) * 100, 0, 100);
   const rows = complianceRows(target, ceiling);
   const recent = rows.slice(-6).reverse();
@@ -151,11 +152,14 @@ export function AdvancedSection({
         <div className="flex items-center gap-4">
           <Readout value={fixed(modulation, 1)} unit="% mod" tone="accent" />
           <Readout
-            value={fixed(running ? loudness(t, target) : target - 60, 1)}
+            value={fixed(running ? loudness(t, target) : Number.NEGATIVE_INFINITY, 1)}
             unit="LUFS-I"
             tone="green"
           />
-          <Readout value={fixed(running ? truePeak(t, ceiling) : -70, 1)} unit="dBTP" />
+          <Readout
+            value={fixed(running ? truePeak(t, ceiling) : Number.NEGATIVE_INFINITY, 1)}
+            unit="dBTP"
+          />
         </div>
       }
     >

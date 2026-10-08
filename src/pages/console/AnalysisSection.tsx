@@ -12,7 +12,11 @@ export function AnalysisSection() {
   const { tel } = useMaster();
 
   const bandGains = cfg.sensus.bands.map((b) => b.gain);
-  const chainGain = tel.outputDb - tel.inputDb;
+  // In standby both taps are -inf — the delta would be NaN, so chain gain is 0.
+  const chainGain =
+    Number.isFinite(tel.outputDb) && Number.isFinite(tel.inputDb)
+      ? tel.outputDb - tel.inputDb
+      : 0;
 
   return (
     <RackUnit

@@ -49,8 +49,15 @@ export function LoudnessSection() {
   const { target: chainTarget, ceiling } = chainTargets(cfg, presetKey);
 
   const offset = tel.integrated - target;
-  const offsetTone =
-    Math.abs(offset) <= 0.5 ? "green" : Math.abs(offset) <= 1.5 ? "amber" : "red";
+  // Standby: integrated is -inf, so the offset is not a deviation to judge —
+  // show it honestly in neutral white instead of flagging an alarm.
+  const offsetTone = !Number.isFinite(offset)
+    ? "default"
+    : Math.abs(offset) <= 0.5
+      ? "green"
+      : Math.abs(offset) <= 1.5
+        ? "amber"
+        : "red";
   const lraTone = tel.lra > 15 ? "red" : tel.lra > 10 ? "amber" : "green";
   const statusTone =
     tel.tpStatus === "SAFE" ? "green" : tel.tpStatus === "WARNING" ? "amber" : "red";
@@ -85,7 +92,12 @@ export function LoudnessSection() {
               unit="dBTP"
               tone={statusTone}
             />
-            <Stat label="Gain reduction" value={`−${fixed(tel.grDb, 1)}`} unit="dB" tone="amber" />
+            <Stat
+              label="Gain reduction"
+              value={tel.grDb > 0.05 ? `−${fixed(tel.grDb, 1)}` : "0.0"}
+              unit="dB"
+              tone="amber"
+            />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -188,7 +200,14 @@ export function LoudnessSection() {
                 <span
                   className="font-mono text-[17px] font-semibold tabular-nums"
                   style={{
-                    color: offsetTone === "green" ? "#4ADE80" : offsetTone === "amber" ? "#F5A524" : "#FF4D4D",
+                    color:
+                      offsetTone === "green"
+                        ? "#4ADE80"
+                        : offsetTone === "amber"
+                          ? "#F5A524"
+                          : offsetTone === "red"
+                            ? "#FF4D4D"
+                            : "rgba(255,255,255,0.92)",
                   }}
                 >
                   {offset >= 0 ? "+" : "−"}

@@ -75,7 +75,7 @@ export function ActivitySection() {
       accent="#F5A524"
       right={
         <div className="flex items-center gap-4">
-          <Readout value={`−${fixed(tel.grDb, 1)}`} unit="dB total" tone="accent" />
+          <Readout value={tel.grDb > 0.05 ? `−${fixed(tel.grDb, 1)}` : "0.0"} unit="dB total" tone="accent" />
           <span
             className={
               running

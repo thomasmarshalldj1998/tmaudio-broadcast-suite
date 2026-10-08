@@ -74,11 +74,18 @@ type Draw = (
   t: number,
 ) => void;
 
-/** Resize-aware rAF canvas. Parent element owns the layout box. */
-export function useCanvas(draw: Draw) {
+/** Resize-aware canvas. Parent element owns the layout box.
+ *
+ *  `active` decides whether a requestAnimationFrame loop runs at all: while
+ *  the engine is in STANDBY the loop is never scheduled — the canvas paints
+ *  exactly one static idle frame (and repaints it on resize or prop change),
+ *  so a stopped console keeps zero background activity. */
+export function useCanvas(draw: Draw, active = true) {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const drawRef = useRef(draw);
   drawRef.current = draw;
+  /** One-shot repaint used while no rAF loop is running. */
+  const paintStatic = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const canvas = ref.current;
@@ -87,6 +94,7 @@ export function useCanvas(draw: Draw) {
     if (!parent) return;
 
     let raf = 0;
+    let looping = false;
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
     let w = 0;
     let h = 0;
@@ -99,6 +107,8 @@ export function useCanvas(draw: Draw) {
       canvas.height = Math.floor(h * dpr);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
+      // Resizing clears the bitmap; with no loop running, restore the frame.
+      if (!looping) paintStatic.current?.();
     };
 
     const observer = new ResizeObserver(resize);
@@ -106,21 +116,40 @@ export function useCanvas(draw: Draw) {
     resize();
 
     const start = performance.now();
-    const loop = (now: number) => {
+    const paint = (now: number) => {
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         drawRef.current(ctx, w, h, (now - start) / 1000);
       }
+    };
+    paintStatic.current = () => paint(performance.now());
+
+    const loop = (now: number) => {
+      paint(now);
       raf = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
+    if (active) {
+      looping = true;
+      raf = requestAnimationFrame(loop);
+    } else {
+      paint(performance.now());
+    }
 
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      looping = false;
+      paintStatic.current = null;
       observer.disconnect();
     };
-  }, []);
+  }, [active]);
+
+  // Standby: no loop exists, so repaint the idle frame after every render
+  // (prop edits must still show up) — one draw per interaction, never a loop.
+  useEffect(() => {
+    if (!active) paintStatic.current?.();
+  });
 
   return ref;
 }
@@ -226,7 +255,7 @@ export function SpectrumAnalyzer({
     ctx.moveTo(0, floor + 0.5);
     ctx.lineTo(w, floor + 0.5);
     ctx.stroke();
-  });
+  }, running);
 
   return (
     <div className="relative h-[168px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
@@ -394,7 +423,7 @@ export function MpxAnalyzer({
     for (let f = 10000; f <= 100000; f += 10000) {
       ctx.fillText(`${f / 1000}k`, x(f) + 2, h - 3);
     }
-  });
+  }, running);
 
   return (
     <div className="relative h-[196px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
@@ -481,7 +510,7 @@ export function BandActivity({
       ctx.fillText(gr > 0.05 ? `−${fixed(gr, 1)}` : "0.0", x0 + colW / 2, h - 2);
       ctx.textAlign = "left";
     }
-  });
+  }, running);
 
   return (
     <div className="relative h-[210px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
@@ -519,7 +548,10 @@ export function LevelMeter({
   const hold = useRef<{ v: number; at: number }>({ v: min, at: 0 });
   const pct = clamp(((value - min) / (max - min)) * 100, 0, 100);
 
-  if (value >= hold.current.v) hold.current = { v: value, at: Date.now() };
+  // STANDBY (-inf): drop the peak-hold marker instantly so a stopped meter
+  // keeps no stale peak — otherwise nothing ticks to decay it.
+  if (!Number.isFinite(value)) hold.current = { v: min, at: Date.now() };
+  else if (value >= hold.current.v) hold.current = { v: value, at: Date.now() };
   else if (Date.now() - hold.current.at > 900) hold.current.v = Math.max(min, hold.current.v - (max - min) * 0.006);
   const holdPct = clamp(((hold.current.v - min) / (max - min)) * 100, 0, 100);
 
@@ -608,7 +640,7 @@ export function CorrelationScope({
     ctx.stroke();
     ctx.globalAlpha = 1;
     ctx.lineWidth = 1;
-  });
+  }, running);
 
   return (
     <div className="relative h-[132px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
@@ -669,7 +701,7 @@ export function BiphaseScope({
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.lineWidth = 1;
-  });
+  }, running);
 
   return (
     <div className="relative h-[96px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
@@ -747,7 +779,7 @@ export function LoudnessHistory({
     ctx.fillText("−10 min", 4, h - 4);
     ctx.fillText("now", w - 26, h - 4);
     ctx.fillText(`${target} LUFS`, 4, y(target) - 4);
-  });
+  }, running);
 
   return (
     <div className="relative h-[150px] w-full overflow-hidden rounded-lg border border-black/60 ring-1 ring-white/5">
@@ -815,7 +847,7 @@ export function CompositeWaveform({
     ctx.moveTo(0, mid + 0.5);
     ctx.lineTo(w, mid + 0.5);
     ctx.stroke();
-  });
+  }, running);
 
   return (
     <div

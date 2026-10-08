@@ -77,6 +77,8 @@ export function Overview({ dirty }: { dirty: boolean }) {
   const preset = getPreset(presetKey);
 
   const stage = (s: Status, label: string, detail: string) => ({ s, label, detail });
+  /** Gain reduction always reads as a reduction — but 0.0 dB, never "−0.0". */
+  const gr = (v: number) => (v > 0.05 ? `−${fixed(v, 1)}` : "0.0");
 
   const enhanceOff =
     cfg.extras.transientEnhancer === 0 &&
@@ -92,12 +94,12 @@ export function Overview({ dirty }: { dirty: boolean }) {
     stage(
       !running || dspBypass ? "grey" : tel.agcGr > 0.05 ? "amber" : "green",
       "AGC",
-      dspBypass ? "bypassed" : `−${fixed(tel.agcGr, 1)} dB`,
+      dspBypass ? "bypassed" : `${gr(tel.agcGr)} dB`,
     ),
     stage(
       !running || dspBypass ? "grey" : tel.mb3Gr > 0.05 ? "amber" : "green",
       "MULTIBAND",
-      dspBypass ? "bypassed" : `−${fixed(tel.mb3Gr, 1)} dB`,
+      dspBypass ? "bypassed" : `${gr(tel.mb3Gr)} dB`,
     ),
     stage(
       !running || dspBypass ? "grey" : enhanceOff ? "grey" : "green",
@@ -107,12 +109,12 @@ export function Overview({ dirty }: { dirty: boolean }) {
     stage(
       !running || dspBypass ? "grey" : tel.clipGr > 0.05 ? "amber" : "green",
       "CLIP",
-      dspBypass ? "bypassed" : `−${fixed(tel.clipGr, 1)} dB`,
+      dspBypass ? "bypassed" : `${gr(tel.clipGr)} dB`,
     ),
     stage(
       !running || dspBypass ? "grey" : tel.limitGr > 0.05 ? "amber" : "green",
       "LIMIT",
-      dspBypass ? "bypassed" : `−${fixed(tel.limitGr, 1)} dB`,
+      dspBypass ? "bypassed" : `${gr(tel.limitGr)} dB`,
     ),
     stage(
       !running || audioBypass ? "grey" : tel.tpStatus === "ERROR" ? "red" : "green",
@@ -132,7 +134,7 @@ export function Overview({ dirty }: { dirty: boolean }) {
       color:
         tel.tpStatus === "SAFE" ? COLOR.green : tel.tpStatus === "WARNING" ? COLOR.amber : COLOR.red,
     },
-    { label: "Gain reduction", value: `−${fixed(tel.grDb, 1)}`, unit: "dB", color: COLOR.amber },
+    { label: "Gain reduction", value: gr(tel.grDb), unit: "dB", color: COLOR.amber },
     { label: "Latency", value: fixed(tel.latencyMs, 2), unit: "ms", color: "rgba(255,255,255,0.95)" },
     {
       label: "Sample rate",

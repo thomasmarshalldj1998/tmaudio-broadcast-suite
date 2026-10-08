@@ -64,7 +64,8 @@ function Meters({
   extra?: string;
 }) {
   const { running } = useConsole();
-  useTick(90);
+  // STANDBY: a stopped chain schedules no repaints and reads -inf, not a floor.
+  useTick(running ? 90 : 0);
   const t = performance.now() / 1000;
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-[#1E232A] p-4">
@@ -76,7 +77,7 @@ function Meters({
       </div>
       <LevelMeter
         label="Integrated loudness"
-        value={running ? loudness(t, target) : -60}
+        value={running ? loudness(t, target) : Number.NEGATIVE_INFINITY}
         min={-40}
         max={-4}
         unit="LUFS"
@@ -84,7 +85,7 @@ function Meters({
       />
       <LevelMeter
         label="True peak"
-        value={running ? truePeak(t, ceiling) : -70}
+        value={running ? truePeak(t, ceiling) : Number.NEGATIVE_INFINITY}
         min={-12}
         max={2}
         ceiling={ceiling}
@@ -93,7 +94,7 @@ function Meters({
       />
       <LevelMeter
         label="Programme (LR)"
-        value={running ? programLevel(t) : -60}
+        value={running ? programLevel(t) : Number.NEGATIVE_INFINITY}
         min={-46}
         max={2}
         ceiling={0}

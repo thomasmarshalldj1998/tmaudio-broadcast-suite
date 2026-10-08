@@ -248,7 +248,7 @@ export function MasterSection() {
             Live
           </span>
           <GrBar value={m.tel.grDb} peak={m.tel.grDb} max={18} width="w-40" />
-          <Readout value={`−${fixed(m.tel.grDb, 1)}`} unit="dB GR" tone="accent" />
+          <Readout value={m.tel.grDb > 0.05 ? `−${fixed(m.tel.grDb, 1)}` : "0.0"} unit="dB GR" tone="accent" />
           <Readout value={fixed(m.tel.outputDb, 1)} unit="dBFS out" />
           <Readout
             value={fixed(m.tel.truePeakDb, 1)}
